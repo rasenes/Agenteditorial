@@ -1,0 +1,15 @@
+{
+  "modes": {
+    "miroir": 0.5,
+    "meta_systeme": 0.5,
+    "humour_noir": 0.4,
+    "tech_lucide": 0.4,
+    "enclair": 0.3,
+    "confession": 0.2
+  },
+  "style": {
+    "silence": 0.5,
+    "dryness": 0.5,
+    "short": 0.6
+  }
+}

@@ -1,0 +1,6 @@
+generation:
+  provider: ollama
+  model: llama3:8b
+
+learning:
+  enabled: true
