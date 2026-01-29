@@ -36,3 +36,9 @@ class Ollama:
             return "[ERREUR] Réponse Ollama invalide"
 
         return data.get("response", "").strip()
+
+def generate(prompt: str) -> str:
+    """
+    Wrapper standard utilisé par l'agent éditorial
+    """
+    return ask_ollama(prompt)  # <-- remplace par TA vraie fonction

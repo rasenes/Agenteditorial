@@ -1,63 +1,46 @@
-from models.router import get_generator
-import re
+from providers.ollama import generate
+from agent.filters import clean_line, is_complete_sentence
 
-FORBIDDEN_ENDINGS = ["en", "que", "de", "à", "pour", "mais"]
+PROMPT_TEMPLATE = """
+Tu es un excellent utilisateur de Twitter/X.
 
-def clean_line(line: str) -> str:
-    line = re.sub(r"^(here are.*?:)", "", line.lower()).strip()
-    line = re.sub(r"^[0-9]+\.", "", line).strip()
-    return line
+Sujet :
+{subject}
 
-def is_complete_sentence(text: str) -> bool:
-    words = text.split()
-    if len(words) < 6:
-        return False
-    if words[-1] in FORBIDDEN_ENDINGS:
-        return False
-    return True
-
-def apply_silence(text: str) -> str:
-    # retire le point final ou un mot évident
-    text = text.rstrip(".")
-    words = text.split()
-    if len(words) > 6:
-        return " ".join(words[:-1])
-    return text
-
-def generate_variants(subject: str, modes: list[str], n: int = 5):
-    model = get_generator()
-
-    prompt = f"""
-Sujet : {subject}
-
-Écris 5 tweets directement postables sur X.
+Angle :
+{mode}
 
 Contraintes :
+- Pas journalistique
+- Pas neutre
+- Pas d'introduction
+- Pas de conclusion
 - Une seule phrase
-- Ton humain, observateur
-- Pas d’explication
-- Pas de morale
-- Pas de hashtag
-- Pas d’emoji
+- Ton humain
 - Français naturel
+- Pas de hashtags
+- Pas d'emojis
 
-Donne UNIQUEMENT les tweets, un par ligne.
+Donne UNIQUEMENT des tweets, un par ligne.
 """
 
-    text = model.generate(prompt)
-    if not text:
-        return []
-
+def generate_variants(subject: str, modes: list[str], n: int = 5) -> list[str]:
     tweets = []
-    for raw in text.split("\n"):
-        clean = clean_line(raw)
-        if not is_complete_sentence(clean):
+
+    for mode in modes:
+        prompt = PROMPT_TEMPLATE.format(subject=subject, mode=mode)
+        text = generate(prompt)
+
+        if not text:
             continue
 
-        tweets.append(clean)
-        tweets.append(apply_silence(clean))
+        for raw in text.split("\n"):
+            clean = clean_line(raw)
+            if not is_complete_sentence(clean):
+                continue
+            tweets.append(clean)
 
-    # déduplication
+    # Déduplication
     final = []
     seen = set()
     for t in tweets:
@@ -66,4 +49,4 @@ Donne UNIQUEMENT les tweets, un par ligne.
             seen.add(key)
             final.append(t)
 
-    return final[:5]
+    return final[:n]
