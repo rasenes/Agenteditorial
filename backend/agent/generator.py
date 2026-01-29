@@ -1,8 +1,9 @@
 from providers.ollama import generate
 from agent.filters import clean_line, is_complete_sentence
 
+
 PROMPT_TEMPLATE = """
-Tu écris comme une vraie personne sur Twitter/X.
+Tu es un excellent utilisateur de Twitter/X.
 
 Sujet :
 "{subject}"
@@ -10,35 +11,36 @@ Sujet :
 Angle :
 {mode}
 
-Règles absolues :
-- Une seule phrase
-- Ton naturel, jamais scolaire
-- Pas de morale
-- Pas d'introduction
+Contraintes :
+- Pas journalistique
+- Pas neutre
+- Pas d’introduction
 - Pas de conclusion
-- Pas d'emojis
+- Une seule phrase
+- Ton humain
+- Français naturel
 - Pas de hashtags
-- Français courant
-
-Style selon l'angle :
-- journalisme : précis, factuel, sans émotion inutile
-- miroir : question qui met mal à l'aise
-- meta_systeme : regard froid sur le système
-- confession : intime, humain, presque vulnérable
-- humour_noir : ironique, sec, un peu cruel
-- minimal : très court, brut
-- business_froid : pragmatique, presque cynique
+- Pas d’emojis
 
 Donne UNIQUEMENT des tweets, un par ligne.
 """
 
-def generate_variants(subject: str, modes: list[str], n: int = 5) -> list[str]:
-    tweets = []
+
+def generate_variants(
+    subject: str,
+    modes: list[str],
+    n: int = 5
+) -> list[str]:
+
+    tweets: list[str] = []
 
     for mode in modes:
-        prompt = PROMPT_TEMPLATE.format(subject=subject, mode=mode)
-        text = generate(prompt)
+        prompt = PROMPT_TEMPLATE.format(
+            subject=subject,
+            mode=mode
+        )
 
+        text = generate(prompt)
         if not text:
             continue
 
@@ -48,13 +50,15 @@ def generate_variants(subject: str, modes: list[str], n: int = 5) -> list[str]:
                 continue
             tweets.append(clean)
 
-    # Déduplication
+    # Déduplication finale
     final = []
     seen = set()
+
     for t in tweets:
-        key = t.lower()
-        if key not in seen and len(t.split()) >= 5:
-            seen.add(key)
-            final.append(t)
+        key = " ".join(t.lower().split()[:6])
+        if key in seen:
+            continue
+        seen.add(key)
+        final.append(t)
 
     return final[:n]
