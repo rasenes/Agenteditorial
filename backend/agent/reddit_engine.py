@@ -2,15 +2,26 @@ import requests
 
 HEADERS = {"User-Agent": "agent-editorial/1.0"}
 
-def fetch_reddit(subreddit: str, limit: int = 5) -> list[str]:
-    url = f"https://www.reddit.com/r/{subreddit}/top.json?limit={limit}&t=day"
-    r = requests.get(url, headers=HEADERS)
-    data = r.json()
+SUBREDDITS = [
+    "france",
+    "unpopularopinion",
+    "confession",
+    "technology",
+]
 
+def fetch_reddit_ideas(limit=5):
     ideas = []
-    for post in data.get("data", {}).get("children", []):
-        title = post["data"].get("title")
-        if title:
-            ideas.append(title)
+
+    for sub in SUBREDDITS:
+        url = f"https://www.reddit.com/r/{sub}/top.json?t=day&limit={limit}"
+        r = requests.get(url, headers=HEADERS, timeout=10)
+        if r.status_code != 200:
+            continue
+
+        data = r.json()
+        for post in data.get("data", {}).get("children", []):
+            title = post["data"].get("title")
+            if title and len(title.split()) > 5:
+                ideas.append(title)
 
     return ideas

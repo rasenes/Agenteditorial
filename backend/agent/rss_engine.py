@@ -1,12 +1,19 @@
 import feedparser
 
-def fetch_rss(url: str, limit: int = 5) -> list[str]:
-    feed = feedparser.parse(url)
+DEFAULT_RSS = [
+    "https://www.lemonde.fr/rss/une.xml",
+    "https://www.francetvinfo.fr/titres.rss",
+    "https://hnrss.org/frontpage",
+]
+
+def fetch_rss_ideas(limit_per_feed=3):
     ideas = []
 
-    for entry in feed.entries[:limit]:
-        title = entry.get("title", "")
-        if title:
-            ideas.append(title)
+    for url in DEFAULT_RSS:
+        feed = feedparser.parse(url)
+        for entry in feed.entries[:limit_per_feed]:
+            title = entry.get("title")
+            if title and len(title.split()) > 4:
+                ideas.append(title)
 
     return ideas
