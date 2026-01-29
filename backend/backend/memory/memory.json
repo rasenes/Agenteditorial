@@ -1,0 +1,22 @@
+{
+  "stats": {
+    "miroir_societe": 1,
+    "bon_sens_populaire": 1,
+    "absurdite_du_systeme": 1
+  },
+  "history": [
+    {
+      "mode": "miroir_societe",
+      "tweet": "La France a décidé de soutenir l'inscription des gardiens de la Révolution iraniens sur la liste européenne des organisations terroristes. Absurdité du système !"
+    },
+    {
+      "mode": "bon_sens_populaire",
+      "tweet": "La France a décidé de soutenir l'inscription des gardiens de la Révolution iraniens sur la liste européenne des organisations terroristes. Absurdité du système !"
+    },
+    {
+      "mode": "absurdite_du_systeme",
+      "tweet": "La France a décidé de soutenir l'inscription des gardiens de la Révolution iraniens sur la liste européenne des organisations terroristes. Absurdité du système !"
+    }
+  ],
+  "scores": {}
+}
