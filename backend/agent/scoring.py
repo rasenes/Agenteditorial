@@ -1,51 +1,38 @@
 import re
 
 POWER_WORDS = [
-    "liberté", "argent", "peur", "vérité", "silence",
-    "interdit", "pouvoir", "contrôle", "hypocrisie"
+    "personne", "tout le monde", "jamais", "toujours",
+    "réalité", "vérité", "problème", "absurde", "grave"
 ]
 
 def score_tweet(tweet: str) -> int:
     score = 0
     t = tweet.lower()
 
-    # longueur idéale
-    if 8 <= len(tweet.split()) <= 22:
+    # Longueur idéale Twitter
+    if 70 <= len(tweet) <= 200:
         score += 2
 
-    # ponctuation engageante
+    # Question = engagement
     if "?" in tweet:
-        score += 1
-    if "!" in tweet:
-        score += 1
+        score += 2
 
-    # mots puissants
+    # Mots puissants
     for w in POWER_WORDS:
         if w in t:
             score += 1
 
-    # pas trop journalistique
-    if re.search(r"\b(selon|a annoncé|a déclaré)\b", t):
+    # Trop journalistique = malus
+    if re.search(r"\b(selon|a déclaré|communiqué|officiel)\b", t):
         score -= 2
+
+    # Trop neutre
+    if tweet.endswith("."):
+        score -= 1
 
     return score
 
 
-def rank_tweets(tweets: list[str], top_k: int = 5) -> list[str]:
-    scored = [(score_tweet(t), t) for t in tweets]
-    scored.sort(reverse=True)
-    return [t for _, t in scored[:top_k]]
-
-ANGLE_BONUS = {
-    "confession": 2,
-    "opinion_impopulaire": 2,
-    "observation_froide": 1,
-    "meta_systeme": 1,
-    "journalisme": -1,
-}
-
-def score_with_angle(tweet: str, angle: str) -> int:
-    base = score_tweet(tweet)
-    bonus = ANGLE_BONUS.get(angle, 0)
-    return base + bonus
-
+def rank_tweets(tweets: list[str], top_k=5) -> list[str]:
+    ranked = sorted(tweets, key=score_tweet, reverse=True)
+    return ranked[:top_k]

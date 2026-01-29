@@ -1,26 +1,31 @@
-import random
+def remix_question(tweet: str) -> str:
+    if "?" in tweet:
+        return tweet
+    return tweet + " Vraiment ?"
 
-OPENERS = [
-    "Personne n’en parle mais",
-    "On ne le dit pas assez :",
-    "Ce qui choque vraiment, c’est que",
-    "Le vrai problème, c’est que",
+
+def remix_contrast(tweet: str) -> str:
+    return f"Tout le monde regarde ailleurs.\n{tweet}"
+
+
+def remix_silence(tweet: str) -> str:
+    return tweet.replace(".", "").strip()
+
+
+REMIXERS = [
+    remix_question,
+    remix_contrast,
+    remix_silence,
 ]
 
-ENDERS = [
-    "",
-    " Et tout le monde fait semblant de ne rien voir.",
-    " Mais personne n’ose le dire.",
-    " Et ça dérange.",
-]
 
-def remix(tweet: str) -> str:
-    t = tweet.strip()
-
-    if len(t.split()) < 6:
-        return t
-
-    opener = random.choice(OPENERS)
-    ender = random.choice(ENDERS)
-
-    return f"{opener} {t[0].lower() + t[1:]}{ender}"
+def remix(tweet: str) -> list[str]:
+    remixed = []
+    for fn in REMIXERS:
+        try:
+            t = fn(tweet)
+            if t and t != tweet:
+                remixed.append(t)
+        except Exception:
+            pass
+    return remixed
