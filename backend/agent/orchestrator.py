@@ -26,7 +26,10 @@ def run_agent(subject: str, forced_mode: str | None = None):
     )
 
     # 4. Filtrage éditorial
+    from agent.filters import score_tweet
+
     tweets = filter_variants(drafts)
+    tweets = sorted(tweets, key=score_tweet, reverse=True)
 
     # Fallback
     if not tweets:
