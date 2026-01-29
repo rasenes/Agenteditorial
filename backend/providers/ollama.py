@@ -1,44 +1,19 @@
 import requests
-import json
 
-class Ollama:
-    def __init__(self, model: str):
-        self.model = model
-        self.url = "http://localhost:11434/api/generate"
-
-    def generate(self, prompt: str) -> str:
-        payload = {
-            "model": self.model,
-            "prompt": prompt,
-            "stream": False,
-            "options": {
-                "num_predict": 60  # limite forte pour éviter les blocages
-            }
-        }
-
-        try:
-            response = requests.post(
-                self.url,
-                json=payload,
-                timeout=120
-            )
-        except requests.exceptions.Timeout:
-            return "[ERREUR] Timeout Ollama"
-        except Exception as e:
-            return f"[ERREUR] {e}"
-
-        if response.status_code != 200:
-            return f"[ERREUR HTTP] {response.status_code}"
-
-        try:
-            data = response.json()
-        except json.JSONDecodeError:
-            return "[ERREUR] Réponse Ollama invalide"
-
-        return data.get("response", "").strip()
+OLLAMA_URL = "http://localhost:11434/api/generate"
+MODEL_NAME = "llama3"
 
 def generate(prompt: str) -> str:
-    """
-    Wrapper standard utilisé par l'agent éditorial
-    """
-    return ask_ollama(prompt)  # <-- remplace par TA vraie fonction
+    payload = {
+        "model": MODEL_NAME,
+        "prompt": prompt,
+        "stream": False,
+    }
+
+    try:
+        r = requests.post(OLLAMA_URL, json=payload, timeout=60)
+        r.raise_for_status()
+        return r.json().get("response", "").strip()
+    except Exception as e:
+        print("[OLLAMA ERROR]", e)
+        return ""
