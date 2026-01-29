@@ -1,0 +1,3 @@
+def post(tweet: str):
+    print("AUTO-POST (mock):")
+    print(tweet)

@@ -1,50 +1,50 @@
-ALL_MODES = {
-    "miroir": "Identification implicite",
-    "confession": "Vulnérabilité maîtrisée",
-    "bugderire": "Ironie douce",
-    "humour_noir": "Lucidité sombre",
-    "renversement": "Surprise calme",
-    "minimal": "Impact pur",
+# Tous les angles disponibles
 
-    "meta_systeme": "Règles implicites",
-    "observateur_froid": "Distance analytique",
-    "contre_narratif": "Opposition calme",
-    "desenchante": "Lucidité fatiguée",
+ALL_MODES = [
+    "observation_froide",
+    "question_directe",
+    "ironie_legere",
+    "constat_genant",
+    "hypocrisie_sociale",
+    "liberte_individuelle",
+    "absurdite_du_systeme",
+    "bon_sens_populaire",
+    "minimal",
+    "miroir_societe",
+    "tech_lucide",
+    "humour_noir_soft",
+    "journalisme_humain",
+]
 
-    "tech_lucide": "Anti-hype technologique",
-    "hacker": "Démystification système",
-    "business_froid": "Logique économique nue"
+
+# Angles sûrs selon le type de sujet
+SMART_GROUPS = {
+    "politique": [
+        "observation_froide",
+        "journalisme_humain",
+        "hypocrisie_sociale",
+        "question_directe",
+    ],
+    "societe": [
+        "miroir_societe",
+        "bon_sens_populaire",
+        "absurdite_du_systeme",
+    ],
+    "tech": [
+        "tech_lucide",
+        "observation_froide",
+        "minimal",
+    ],
 }
 
-MECHANIC_TO_MODES = {
-    "social": ["miroir", "bugderire", "renversement"],
-    "systeme": ["meta_systeme", "observateur_froid"],
-    "tech": ["tech_lucide", "hacker"],
-    "emotion": ["confession", "miroir"]
-}
 
-def choose_modes(mechanic: str, forced_mode: str | None = None, bias: list[str] | None = None):
-    # sécurité : mode invalide → auto
-    if forced_mode and forced_mode not in ALL_MODES and forced_mode != "auto":
-        forced_mode = "auto"
+def shortlist_modes(subject: str) -> list[str]:
+    s = subject.lower()
 
-    if forced_mode and forced_mode != "auto":
-        return [forced_mode]
+    if any(k in s for k in ["loi", "etat", "assemblee", "politique"]):
+        return SMART_GROUPS["politique"]
 
-    modes = MECHANIC_TO_MODES.get(mechanic, ["miroir"]).copy()
+    if any(k in s for k in ["ia", "tech", "algorithme"]):
+        return SMART_GROUPS["tech"]
 
-    if bias:
-        for b in bias:
-            if b in ALL_MODES and b not in modes:
-                modes.append(b)
-
-    return modes[:3]
-
-def allowed_modes_by_level(level: int) -> list[str]:
-    if level >= 70:
-        return ["journalisme_x", "observateur_froid"]
-    if level >= 50:
-        return ["journalisme_x", "miroir", "en_clair"]
-    if level >= 30:
-        return ["miroir", "renversement", "implicite"]
-    return ["implicite", "minimal", "silence"]
+    return SMART_GROUPS["societe"]

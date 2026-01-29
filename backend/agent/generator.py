@@ -1,12 +1,14 @@
+from typing import List
+
 from providers.ollama import generate
-from agent.filters import clean_line, is_complete_sentence
+from agent.filters import clean_line, is_complete_sentence, filter_tweets
 
 
 PROMPT_TEMPLATE = """
 Tu es un excellent utilisateur de Twitter/X.
 
 Sujet :
-"{subject}"
+{subject}
 
 Angle :
 {mode}
@@ -14,25 +16,25 @@ Angle :
 Contraintes :
 - Pas journalistique
 - Pas neutre
-- Pas d’introduction
+- Pas d'introduction
 - Pas de conclusion
 - Une seule phrase
 - Ton humain
 - Français naturel
 - Pas de hashtags
-- Pas d’emojis
+- Pas d'emojis
 
-Donne UNIQUEMENT des tweets, un par ligne.
+Donne UNIQUEMENT les tweets, un par ligne.
 """
 
 
 def generate_variants(
     subject: str,
-    modes: list[str],
+    modes: List[str],
     n: int = 5
-) -> list[str]:
+) -> List[str]:
 
-    tweets: list[str] = []
+    tweets = []
 
     for mode in modes:
         prompt = PROMPT_TEMPLATE.format(
@@ -50,15 +52,7 @@ def generate_variants(
                 continue
             tweets.append(clean)
 
-    # Déduplication finale
-    final = []
-    seen = set()
+    # 🔥 Filtrage Twitter PRO
+    tweets = filter_tweets(tweets, min_score=1)
 
-    for t in tweets:
-        key = " ".join(t.lower().split()[:6])
-        if key in seen:
-            continue
-        seen.add(key)
-        final.append(t)
-
-    return final[:n]
+    return tweets[:n]

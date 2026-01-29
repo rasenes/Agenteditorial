@@ -1,42 +1,25 @@
-from agent.analysis import analyze_subject
-from agent.angles import shortlist_angles
+from agent.modes import shortlist_modes
 from agent.generator import generate_variants
-from agent.filters import filter_variants
+from agent.scoring import rank_tweets
+# ...existing code...
 
+def run_agent(subject: str) -> dict:
+    # 1️⃣ Choix intelligent des angles
+    modes = shortlist_modes(subject)
 
-def run_agent(subject: str, forced_mode: str | None = None):
-    # 1. Analyse du sujet
-    analysis = analyze_subject(subject)
-
-    # 2. Sélection des angles
-    if forced_mode:
-        modes = [forced_mode]
-    else:
-        modes = shortlist_angles(subject)
-
-    # Sécurité
-    if not modes:
-        modes = ["factuel", "opinion"]
-
-    # 3. Génération brute
-    drafts = generate_variants(
+    # 2️⃣ Génération
+    tweets = generate_variants(
         subject=subject,
         modes=modes,
         n=12
     )
 
-    # 4. Filtrage éditorial
-    from agent.filters import score_tweet
-
-    tweets = filter_variants(drafts)
-    tweets = sorted(tweets, key=score_tweet, reverse=True)
-
-    # Fallback
-    if not tweets:
-        tweets = drafts[:3]
+    # 3️⃣ Classement (évite l'utilisation d'une variable non définie au niveau module)
+    top_tweets = rank_tweets(tweets, top_k=5)
 
     return {
-        "analysis": analysis.get("summary", ""),
+        "analysis": "Observation générale",
         "modes": modes,
-        "tweets": tweets[:6]
+        "tweets": tweets,
+        "top_tweets": top_tweets,
     }
