@@ -1,0 +1,60 @@
+# Configuration pour Editorial Agent IA
+# Copier en backup: settings.yaml
+
+app:
+  app_name: "Editorial Agent IA"
+  version: "1.0.0"
+  debug: false
+  log_level: "INFO"
+
+api:
+  api_host: "0.0.0.0"
+  api_port: 8000
+  api_prefix: "/api/v1"
+
+llm:
+  provider: "ollama"  # ollama, openai, groq
+  model: "mistral"
+  temperature: 0.7
+  max_tokens: 500
+  timeout: 30
+
+ollama:
+  base_url: "http://localhost:11434"
+  model: "mistral"
+  temperature: 0.7
+  timeout: 30
+
+openai:
+  api_key: ""  # Set via env variable
+  model: "gpt-3.5-turbo"
+  temperature: 0.7
+  timeout: 30
+
+groq:
+  api_key: ""  # Set via env variable
+  model: "mixtral-8x7b-32768"
+  temperature: 0.7
+  timeout: 30
+
+sources:
+  rss_feeds:
+    - "https://news.ycombinator.com/rss"
+    - "https://feeds.techcrunch.com/techcrunch/"
+    - "https://www.theverge.com/rss/index.xml"
+  newsapi_key: ""  # Set via env variable
+  reddit_enabled: false
+  twitter_enabled: false
+  youtube_enabled: false
+  update_interval: 3600
+
+memory:
+  enabled: true
+  path: "backend/data/memory.json"
+  max_size: 10000
+  cleanup_interval: 86400
+
+cache:
+  enabled: true
+  ttl: 3600
+  max_size: 1000
