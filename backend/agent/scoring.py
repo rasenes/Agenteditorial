@@ -1,38 +1,56 @@
 import re
+from agent.memory_engine import load_memory
 
-POWER_WORDS = [
-    "personne", "tout le monde", "jamais", "toujours",
-    "réalité", "vérité", "problème", "absurde", "grave"
-]
 
-def score_tweet(tweet: str) -> int:
-    score = 0
-    t = tweet.lower()
+def _length_score(text: str) -> float:
+    l = len(text)
+    if 80 <= l <= 220:
+        return 1.0
+    if 60 <= l < 80 or 220 < l <= 260:
+        return 0.7
+    return 0.3
 
-    # Longueur idéale Twitter
-    if 70 <= len(tweet) <= 200:
-        score += 2
 
-    # Question = engagement
-    if "?" in tweet:
-        score += 2
+def _emotion_score(text: str) -> float:
+    triggers = [
+        "?", "!", "jamais", "toujours", "incroyable",
+        "absurde", "folie", "vérité", "personne",
+        "tout le monde", "ils", "on"
+    ]
+    return sum(1 for t in triggers if t in text.lower()) * 0.15
 
-    # Mots puissants
-    for w in POWER_WORDS:
-        if w in t:
-            score += 1
 
-    # Trop journalistique = malus
-    if re.search(r"\b(selon|a déclaré|communiqué|officiel)\b", t):
-        score -= 2
+def _structure_score(text: str) -> float:
+    if text.count("?") >= 1:
+        return 0.5
+    if ":" in text:
+        return 0.4
+    if text.startswith(("Pourquoi", "Personne", "On nous", "Tout le monde")):
+        return 0.6
+    return 0.2
 
-    # Trop neutre
-    if tweet.endswith("."):
-        score -= 1
 
+def _memory_bonus(text: str) -> float:
+    memory = load_memory()
+    history = memory.get("history", [])
+
+    for item in history[-50:]:
+        if item["tweet"][:40].lower() in text.lower():
+            return -0.5  # pénalité répétition
+
+    return 0.3
+
+
+def score_tweet(text: str) -> float:
+    score = 0.0
+    score += _length_score(text)
+    score += _emotion_score(text)
+    score += _structure_score(text)
+    score += _memory_bonus(text)
     return score
 
 
-def rank_tweets(tweets: list[str], top_k=5) -> list[str]:
-    ranked = sorted(tweets, key=score_tweet, reverse=True)
-    return ranked[:top_k]
+def rank_tweets(tweets: list[str], top_k: int = 5) -> list[str]:
+    scored = [(t, score_tweet(t)) for t in tweets]
+    scored.sort(key=lambda x: x[1], reverse=True)
+    return [t for t, _ in scored[:top_k]]

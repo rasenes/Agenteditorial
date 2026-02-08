@@ -2,7 +2,10 @@
   "stats": {
     "miroir_societe": 1,
     "bon_sens_populaire": 1,
-    "absurdite_du_systeme": 1
+    "absurdite_du_systeme": 1,
+    "tech_lucide": 1,
+    "observation_froide": 1,
+    "minimal": 1
   },
   "history": [
     {
@@ -16,6 +19,18 @@
     {
       "mode": "absurdite_du_systeme",
       "tweet": "La France a décidé de soutenir l'inscription des gardiens de la Révolution iraniens sur la liste européenne des organisations terroristes. Absurdité du système !"
+    },
+    {
+      "mode": "tech_lucide",
+      "tweet": "L’Assemblée nationale qui nous gouverne ?! Elle veut réduire l'amour en simple contrats et licencier le devoir conjugal !"
+    },
+    {
+      "mode": "observation_froide",
+      "tweet": "L’Assemblée nationale qui nous gouverne ?! Elle veut réduire l'amour en simple contrats et licencier le devoir conjugal !"
+    },
+    {
+      "mode": "minimal",
+      "tweet": "L’Assemblée nationale qui nous gouverne ?! Elle veut réduire l'amour en simple contrats et licencier le devoir conjugal !"
     }
   ],
   "scores": {}

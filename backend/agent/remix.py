@@ -1,31 +1,15 @@
-def remix_question(tweet: str) -> str:
-    if "?" in tweet:
-        return tweet
-    return tweet + " Vraiment ?"
+import random
 
-
-def remix_contrast(tweet: str) -> str:
-    return f"Tout le monde regarde ailleurs.\n{tweet}"
-
-
-def remix_silence(tweet: str) -> str:
-    return tweet.replace(".", "").strip()
-
-
-REMIXERS = [
-    remix_question,
-    remix_contrast,
-    remix_silence,
+PATTERNS = [
+    "Personne ne parle de ça, mais {}",
+    "On ne vous dira jamais que {}",
+    "Tout le monde débat de {}, mais personne ne voit le vrai problème",
+    "Ce n’est pas {}, c’est bien pire",
+    "{}. Et ça dit beaucoup de notre époque."
 ]
 
 
-def remix(tweet: str) -> list[str]:
-    remixed = []
-    for fn in REMIXERS:
-        try:
-            t = fn(tweet)
-            if t and t != tweet:
-                remixed.append(t)
-        except Exception:
-            pass
-    return remixed
+def remix(text: str) -> str:
+    pattern = random.choice(PATTERNS)
+    core = text.strip().rstrip(".")
+    return pattern.format(core)

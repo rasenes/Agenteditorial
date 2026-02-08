@@ -1,19 +1,26 @@
+# backend/agent/translator.py
+from typing import List
 from providers.ollama import generate
 
-TRANSLATE_PROMPT = """
-Traduis le texte suivant en français.
-Garde un ton naturel, courant, Twitter.
-Pas de commentaire, pas d'explication.
 
-Texte :
-{text}
-"""
+def translate_to_fr(texts: List[str]) -> List[str]:
+    """
+    Traduit une liste de textes vers le français proprement
+    (reste sur Ollama uniquement)
+    """
+    translated = []
 
-def translate_to_french(text: str, lang: str) -> str:
-    if lang == "fr":
-        return text
+    for text in texts:
+        prompt = (
+            "Traduis le texte suivant en français naturel, fluide et moderne. "
+            "Ne rajoute rien.\n\n"
+            f"TEXTE:\n{text}"
+        )
 
-    prompt = TRANSLATE_PROMPT.format(text=text)
-    translated = generate(prompt)
+        try:
+            fr = generate(prompt)
+            translated.append(fr.strip())
+        except Exception:
+            translated.append(text)  # fallback sécurisé
 
-    return translated.strip() if translated else text
+    return translated
