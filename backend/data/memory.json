@@ -1,15 +1,194 @@
 {
-  "modes": {
-    "miroir": 0.5,
-    "meta_systeme": 0.5,
-    "humour_noir": 0.4,
-    "tech_lucide": 0.4,
-    "enclair": 0.3,
-    "confession": 0.2
+  "tweets": [
+    {
+      "id": "rmx-402c6069bb9ff950",
+      "text": "Tout le monde regarde string, peu voient l'effet secondaire: le vrai gagnant sera celui qui agit avant la foule ? Voilà le vrai sujet.",
+      "theme": "IA",
+      "style": "story",
+      "language": "fr",
+      "angle": "contradiction",
+      "source_trend_id": "manual-5134804841687261488",
+      "provider_used": "fallback",
+      "score": 0.6185,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.7,
+        "contradiction": 0.25,
+        "viral": 0.52,
+        "total": 0.6185
+      },
+      "created_at": 1770635119.5794623
+    },
+    {
+      "id": "rmx-7f629a10e03293c0",
+      "text": "Bien sûr, tout est sous contrôle... sauf que string: ce n'est pas juste une news, c'est un signal faible qui va redéfinir le débat des 12 prochains mois.",
+      "theme": "IA",
+      "style": "ironique",
+      "language": "fr",
+      "angle": "insight",
+      "source_trend_id": "manual-5134804841687261488",
+      "provider_used": "fallback",
+      "score": 0.6027,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 0.92,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.47,
+        "viral": 0.48000000000000004,
+        "total": 0.6027
+      },
+      "created_at": 1770635119.5795329
+    },
+    {
+      "id": "rmx-a28a1168e5326f2a",
+      "text": "string: ce n'est pas juste une news, c'est un signal faible qui va redéfinir le débat des 12 prochains mois ? Voilà le vrai sujet.",
+      "theme": "IA",
+      "style": "story",
+      "language": "fr",
+      "angle": "insight",
+      "source_trend_id": "manual-5134804841687261488",
+      "provider_used": "fallback",
+      "score": 0.6005,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.25,
+        "viral": 0.6000000000000001,
+        "total": 0.6005
+      },
+      "created_at": 1770635119.5795896
+    },
+    {
+      "id": "tw-553ec189f6115be3",
+      "text": "string: ce n'est pas juste une news, c'est un signal faible qui va redéfinir le débat des 12 prochains mois.",
+      "theme": "string",
+      "style": "insight",
+      "language": "fr",
+      "angle": "insight",
+      "source_trend_id": "manual-5134804841687261488",
+      "provider_used": "fallback",
+      "score": 0.5845,
+      "breakdown": {
+        "length": 0.8,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.7,
+        "contradiction": 0.25,
+        "viral": 0.48000000000000004,
+        "total": 0.5845
+      },
+      "created_at": 1770635213.3577862
+    },
+    {
+      "id": "tw-7a974f1503c5c5dd",
+      "text": "string prouve une chose: quand le rythme accélère, l'inaction devient une décision risquée.",
+      "theme": "string",
+      "style": "insight",
+      "language": "fr",
+      "angle": "urgence",
+      "source_trend_id": "manual-5134804841687261488",
+      "provider_used": "fallback",
+      "score": 0.5725,
+      "breakdown": {
+        "length": 0.8,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.7,
+        "contradiction": 0.25,
+        "viral": 0.4,
+        "total": 0.5725
+      },
+      "created_at": 1770635213.3579931
+    }
+  ],
+  "favorites": [],
+  "style_stats": {
+    "story": {
+      "count": 2,
+      "score_sum": 1.219
+    },
+    "ironique": {
+      "count": 1,
+      "score_sum": 0.6027
+    },
+    "insight": {
+      "count": 2,
+      "score_sum": 1.157
+    }
   },
-  "style": {
-    "silence": 0.5,
-    "dryness": 0.5,
-    "short": 0.6
-  }
+  "theme_heatmap": {
+    "IA": {
+      "count": 3,
+      "score_sum": 1.8217
+    },
+    "string": {
+      "count": 2,
+      "score_sum": 1.157
+    }
+  },
+  "history": [
+    {
+      "id": "hist-1770635119579",
+      "theme": "IA",
+      "trend_text": "string",
+      "draft_mode": false,
+      "created_at": 1770635119.5794253,
+      "tweet_ids": [
+        "rmx-402c6069bb9ff950",
+        "rmx-7f629a10e03293c0",
+        "rmx-a28a1168e5326f2a"
+      ],
+      "top_score": 0.6185
+    },
+    {
+      "id": "hist-1770635213357",
+      "theme": "string",
+      "trend_text": "string",
+      "draft_mode": true,
+      "created_at": 1770635213.357541,
+      "tweet_ids": [
+        "tw-553ec189f6115be3",
+        "tw-2ef1cca531ef0246",
+        "tw-7a974f1503c5c5dd"
+      ],
+      "top_score": 0.5845
+    },
+    {
+      "id": "hist-1770635224440",
+      "theme": "string",
+      "trend_text": "string",
+      "draft_mode": true,
+      "created_at": 1770635224.4403834,
+      "tweet_ids": [
+        "tw-553ec189f6115be3",
+        "tw-2ef1cca531ef0246",
+        "tw-7a974f1503c5c5dd"
+      ],
+      "top_score": 0.5845
+    }
+  ],
+  "ab_tests": [
+    {
+      "id": "ab-1770635224452",
+      "winner": "A",
+      "theme": "string",
+      "trend_text": "string",
+      "variant_a_style": "insight",
+      "variant_b_style": "ironique",
+      "variant_a_avg_score": 0.5765,
+      "variant_b_avg_score": 0.5765,
+      "created_at": 1770635224.452364
+    }
+  ],
+  "updated_at": 1770635224.4523861
 }
