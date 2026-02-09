@@ -1,0 +1,249 @@
+{
+  "generated_at": 1770636758.0189838,
+  "trend": {
+    "id": "reddit-6f3c5a663aa9ad4d",
+    "title": "Cuba warns airlines that it will be out of fuel for planes in 24 hours",
+    "summary": "",
+    "source": "reddit",
+    "source_url": "https://reddit.com/r/worldnews/comments/1qzqg97/cuba_warns_airlines_that_it_will_be_out_of_fuel/",
+    "language": "en",
+    "theme": "IA",
+    "momentum": 21.234,
+    "viral_angle": "chiffres",
+    "tags": [],
+    "created_at": 1770636686.9571471
+  },
+  "top3": [
+    {
+      "id": "tw-482f8a02918cf11b",
+      "text": "Alerte rouge : les vols vers Cuba sont en danger de se trouver sans carburant ! Mais quels sont les chiffres réels derrière ce manque d'essence ?",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "question",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.683,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.63,
+        "mirror": 0.35,
+        "punchline": 0.7000000000000001,
+        "contradiction": 0.47,
+        "viral": 0.52,
+        "total": 0.683
+      }
+    },
+    {
+      "id": "tw-b9522f31407ac00b",
+      "text": "Cuba alerte les compagnies aériennes : pas assez de carburant pour demain. Une nation entière risque d'être immobilisée. Quel est notre rôle dans cette crise ?",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "urgence",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.6188,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 0.88,
+        "emotion": 0.55,
+        "mirror": 0.35,
+        "punchline": 0.7000000000000001,
+        "contradiction": 0.25,
+        "viral": 0.52,
+        "total": 0.6188
+      }
+    },
+    {
+      "id": "tw-bb7acfa786388912",
+      "text": "La crise carburant à Cuba est une urgence pour toute l'industrie aérienne. Mais les solutions proposées n'ont pas d'avenir : le pétrole ne sera plus disponible pour l'aviation en 2050.",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "punchline",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.6155,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.47,
+        "viral": 0.48000000000000004,
+        "total": 0.6155
+      }
+    }
+  ],
+  "all_candidates": [
+    {
+      "id": "tw-482f8a02918cf11b",
+      "text": "Alerte rouge : les vols vers Cuba sont en danger de se trouver sans carburant ! Mais quels sont les chiffres réels derrière ce manque d'essence ?",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "question",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.683,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.63,
+        "mirror": 0.35,
+        "punchline": 0.7000000000000001,
+        "contradiction": 0.47,
+        "viral": 0.52,
+        "total": 0.683
+      }
+    },
+    {
+      "id": "tw-b9522f31407ac00b",
+      "text": "Cuba alerte les compagnies aériennes : pas assez de carburant pour demain. Une nation entière risque d'être immobilisée. Quel est notre rôle dans cette crise ?",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "urgence",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.6188,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 0.88,
+        "emotion": 0.55,
+        "mirror": 0.35,
+        "punchline": 0.7000000000000001,
+        "contradiction": 0.25,
+        "viral": 0.52,
+        "total": 0.6188
+      }
+    },
+    {
+      "id": "tw-bb7acfa786388912",
+      "text": "La crise carburant à Cuba est une urgence pour toute l'industrie aérienne. Mais les solutions proposées n'ont pas d'avenir : le pétrole ne sera plus disponible pour l'aviation en 2050.",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "punchline",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.6155,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.47,
+        "viral": 0.48000000000000004,
+        "total": 0.6155
+      }
+    },
+    {
+      "id": "tw-e1675e1584cfd04d",
+      "text": "A Cuba, pas assez de carburant pour les vols. Mais ce n'est pas le seul pays à risquer une crise énergétique. Quand la consommation dépassera-t-elle la production ?",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "question",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.6098,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 0.88,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.55,
+        "contradiction": 0.47,
+        "viral": 0.52,
+        "total": 0.6098
+      }
+    },
+    {
+      "id": "tw-04b63a95bbb2288b",
+      "text": "Le manque de carburant à Cuba est un avertissement pour tous : la pénurie peut frapper n'importe où. Le monde entier doit prendre garde.",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "ironie",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.6005,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.7,
+        "contradiction": 0.25,
+        "viral": 0.4,
+        "total": 0.6005
+      }
+    },
+    {
+      "id": "tw-8a6cde5e74dafe14",
+      "text": "L'aviation mondiale dépend du carburant. Les économies en place ne suffisent pas à fournir une solution durable. Chiffres : le pétrole utilisé pour l'aviation représente seulement 2 % des consommations mondiales, mais la croissance est exponentielle.",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "data",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.5683,
+      "breakdown": {
+        "length": 0.8,
+        "clarity": 0.88,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.47,
+        "viral": 0.48000000000000004,
+        "total": 0.5683
+      }
+    }
+  ],
+  "memory": {
+    "tweets_count": 28,
+    "favorites_count": 0,
+    "history_count": 11,
+    "avg_score": 0.6055,
+    "top_styles": [
+      {
+        "style": "insight",
+        "count": 12,
+        "avg_score": 0.6115
+      },
+      {
+        "style": "story",
+        "count": 9,
+        "avg_score": 0.6038
+      },
+      {
+        "style": "ironique",
+        "count": 7,
+        "avg_score": 0.5976
+      }
+    ],
+    "theme_heatmap": [
+      {
+        "theme": "IA",
+        "count": 26,
+        "avg_score": 0.6076
+      },
+      {
+        "theme": "string",
+        "count": 2,
+        "avg_score": 0.5785
+      }
+    ],
+    "updated_at": 1770636758.0119987
+  },
+  "settings": {
+    "llm_provider": "ollama",
+    "ollama_model": "mistral"
+  }
+}

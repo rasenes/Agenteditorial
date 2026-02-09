@@ -20,7 +20,7 @@ load_dotenv()
 @dataclass
 class AppMetaConfig:
     app_name: str = "Editorial Agent IA"
-    version: str = "2.0.0"
+    version: str = "2.1.2"
     debug: bool = False
     environment: str = "development"
     log_level: str = "INFO"
@@ -38,14 +38,15 @@ class APIConfig:
 class LLMRuntimeConfig:
     primary_provider: str = "ollama"
     fallback_order: list[str] = field(default_factory=lambda: ["ollama", "openai", "groq"])
-    request_timeout_sec: float = 4.0
-    max_retries: int = 1
+    # Local Ollama can be slow; keep this generous and override via LLM_TIMEOUT_SEC.
+    request_timeout_sec: float = 180.0
+    max_retries: int = 0
 
 
 @dataclass
 class OllamaConfig:
     base_url: str = "http://localhost:11434"
-    model: str = "llama3.1:8b"
+    model: str = "llama3"
     temperature: float = 0.7
 
 
@@ -73,8 +74,6 @@ class SourcesConfig:
         ]
     )
     newsapi_key: str = ""
-    reddit_client_id: str = ""
-    reddit_client_secret: str = ""
     reddit_user_agent: str = "editorial-agent/1.0"
     enable_twitter_trends: bool = False
     enable_youtube_trends: bool = False
@@ -101,7 +100,7 @@ class GenerationConfig:
     default_language: str = "fr"
     supported_languages: list[str] = field(default_factory=lambda: ["en", "fr", "es", "de"])
     candidates_per_request: int = 9
-    max_parallel_generations: int = 4
+    max_parallel_generations: int = 1
 
 
 @dataclass
@@ -131,7 +130,14 @@ def _apply_env_overrides(settings: Settings) -> None:
     settings.groq.api_key = os.getenv("GROQ_API_KEY", settings.groq.api_key)
     settings.sources.newsapi_key = os.getenv("NEWSAPI_KEY", settings.sources.newsapi_key)
     settings.ollama.base_url = os.getenv("OLLAMA_BASE_URL", settings.ollama.base_url)
+    settings.ollama.model = os.getenv("OLLAMA_MODEL", settings.ollama.model)
     settings.llm.primary_provider = os.getenv("LLM_PROVIDER", settings.llm.primary_provider)
+
+    if os.getenv("LLM_TIMEOUT_SEC"):
+        try:
+            settings.llm.request_timeout_sec = float(os.getenv("LLM_TIMEOUT_SEC", ""))
+        except Exception:
+            pass
 
 
 

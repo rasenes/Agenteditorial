@@ -1,9 +1,9 @@
 @echo off
-REM Startup script (Windows)
+REM Startup script (Windows) - One command experience
 
 echo.
-echo Editorial Agent IA - Startup Script
-echo ==================================
+echo Editorial Agent IA - One Command
+echo ===============================
 echo.
 
 echo Python version:
@@ -27,20 +27,29 @@ if not exist "backend\data" mkdir backend\data
 if not exist "backend\logs" mkdir backend\logs
 
 echo.
-echo Starting Editorial Agent...
+echo Checking providers...
+python -m backend.cli doctor
+
+echo.
+echo Running AUTO pipeline (no docs, no clicks)...
+echo.
+python -m backend.cli run --trends 10 --count 12 --remix --out backend\data\latest_run.json
+
+echo.
+echo Optional: start API + UI dashboards
 echo Backend:  http://localhost:8000
 echo Frontend: http://localhost:8501
 echo.
 
-echo Starting Backend...
 start "Editorial Agent - Backend" cmd /k "python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000"
 
 timeout /t 2 >nul
 
-echo Starting Frontend...
 start "Editorial Agent - Frontend" cmd /k "streamlit run frontend\app.py"
 
+timeout /t 2 >nul
+start http://localhost:8501
+
 echo.
-echo Editorial Agent is starting...
-echo Use Ctrl+C in each terminal to stop.
+echo Done. Latest run saved to backend\data\latest_run.json
 pause

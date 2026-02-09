@@ -32,7 +32,7 @@ async def async_retry(
                 break
             await asyncio.sleep(current_delay + random.uniform(0, jitter))
             current_delay *= backoff
-    raise RuntimeError(f"retry exhausted: {last_exc}") from last_exc
+    raise RuntimeError(f"retry exhausted: {last_exc!r}") from last_exc
 
 
 

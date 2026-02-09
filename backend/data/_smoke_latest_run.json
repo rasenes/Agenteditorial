@@ -1,0 +1,249 @@
+{
+  "generated_at": 1770636595.5118632,
+  "trend": {
+    "id": "reddit-6f3c5a663aa9ad4d",
+    "title": "Cuba warns airlines that it will be out of fuel for planes in 24 hours",
+    "summary": "",
+    "source": "reddit",
+    "source_url": "https://reddit.com/r/worldnews/comments/1qzqg97/cuba_warns_airlines_that_it_will_be_out_of_fuel/",
+    "language": "en",
+    "theme": "IA",
+    "momentum": 21.203,
+    "viral_angle": "chiffres",
+    "tags": [],
+    "created_at": 1770636533.5335355
+  },
+  "top3": [
+    {
+      "id": "tw-6329d1d38335e08a",
+      "text": "Alarme à Cuba : pas assez de carburant pour les avions dans 24 heures. La révolution numérique attendue ? #IA #Cuba",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "visionnaire",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.6268,
+      "breakdown": {
+        "length": 0.8,
+        "clarity": 0.88,
+        "emotion": 0.55,
+        "mirror": 0.35,
+        "punchline": 0.7,
+        "contradiction": 0.25,
+        "viral": 0.76,
+        "total": 0.6268
+      }
+    },
+    {
+      "id": "tw-068c1c015abd3104",
+      "text": "En attendant de savoir comment les airlines seront ravitaillées en carburant à Cuba, l'intelligence artificielle pourrait-elle trouver une solution ? #IA #Cuba",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "lucide",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.62,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.55,
+        "contradiction": 0.25,
+        "viral": 0.68,
+        "total": 0.62
+      }
+    },
+    {
+      "id": "tw-b086577e34447a88",
+      "text": "Le rationnement énergétique en cours à Cuba : un test de l'intelligence artificielle pour les airlines ? #IA #Cuba",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "concret",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.6145,
+      "breakdown": {
+        "length": 0.8,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.7,
+        "contradiction": 0.25,
+        "viral": 0.68,
+        "total": 0.6145
+      }
+    }
+  ],
+  "all_candidates": [
+    {
+      "id": "tw-6329d1d38335e08a",
+      "text": "Alarme à Cuba : pas assez de carburant pour les avions dans 24 heures. La révolution numérique attendue ? #IA #Cuba",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "visionnaire",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.6268,
+      "breakdown": {
+        "length": 0.8,
+        "clarity": 0.88,
+        "emotion": 0.55,
+        "mirror": 0.35,
+        "punchline": 0.7,
+        "contradiction": 0.25,
+        "viral": 0.76,
+        "total": 0.6268
+      }
+    },
+    {
+      "id": "tw-068c1c015abd3104",
+      "text": "En attendant de savoir comment les airlines seront ravitaillées en carburant à Cuba, l'intelligence artificielle pourrait-elle trouver une solution ? #IA #Cuba",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "lucide",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.62,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.55,
+        "contradiction": 0.25,
+        "viral": 0.68,
+        "total": 0.62
+      }
+    },
+    {
+      "id": "tw-b086577e34447a88",
+      "text": "Le rationnement énergétique en cours à Cuba : un test de l'intelligence artificielle pour les airlines ? #IA #Cuba",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "concret",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.6145,
+      "breakdown": {
+        "length": 0.8,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.7,
+        "contradiction": 0.25,
+        "viral": 0.68,
+        "total": 0.6145
+      }
+    },
+    {
+      "id": "tw-ef014d8fdd473d16",
+      "text": "Pour les airlines qui naviguent vers Cuba, un défi : pas d'AVGAS disponible dans 24 heures. L'IA au secours ? #IA #Cuba",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "concret",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.6073,
+      "breakdown": {
+        "length": 0.8,
+        "clarity": 0.88,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.7,
+        "contradiction": 0.25,
+        "viral": 0.76,
+        "total": 0.6073
+      }
+    },
+    {
+      "id": "tw-570cd925fcdbcbb1",
+      "text": "En attendant des solutions, les avions devraient-ils se conduire eux-mêmes à Cuba ? Le prochain défi de l'IA ? #IA #Cuba",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "lucide",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.6008,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 0.88,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.55,
+        "contradiction": 0.25,
+        "viral": 0.68,
+        "total": 0.6008
+      }
+    },
+    {
+      "id": "tw-42cab444e20a3990",
+      "text": "La crise énergétique en cours à Cuba : un défi pour l'IA qui devra trouver une solution en temps voulu. #IA #Cuba",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "visionnaire",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.5965,
+      "breakdown": {
+        "length": 0.8,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.7,
+        "contradiction": 0.25,
+        "viral": 0.56,
+        "total": 0.5965
+      }
+    }
+  ],
+  "memory": {
+    "tweets_count": 25,
+    "favorites_count": 0,
+    "history_count": 10,
+    "avg_score": 0.6015,
+    "top_styles": [
+      {
+        "style": "story",
+        "count": 9,
+        "avg_score": 0.6038
+      },
+      {
+        "style": "insight",
+        "count": 9,
+        "avg_score": 0.6023
+      },
+      {
+        "style": "ironique",
+        "count": 7,
+        "avg_score": 0.5976
+      }
+    ],
+    "theme_heatmap": [
+      {
+        "theme": "IA",
+        "count": 23,
+        "avg_score": 0.6035
+      },
+      {
+        "theme": "string",
+        "count": 2,
+        "avg_score": 0.5785
+      }
+    ],
+    "updated_at": 1770636592.7523725
+  },
+  "settings": {
+    "llm_provider": "ollama",
+    "ollama_model": "mistral"
+  }
+}

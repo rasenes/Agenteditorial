@@ -20,9 +20,26 @@ class OllamaClient:
         try:
             async with httpx.AsyncClient(timeout=timeout) as client:
                 response = await client.get(f"{self.base_url}/api/tags")
-                return response.status_code == 200
+                response.raise_for_status()
+                payload = response.json()
         except Exception:  # noqa: BLE001
             return False
+
+        models = [m.get("name", "") for m in payload.get("models", []) if isinstance(m, dict)]
+        if not models:
+            return True
+
+        wanted = (self.model or "").strip().lower()
+        if not wanted:
+            return True
+
+        for name in models:
+            name_lower = str(name).lower()
+            if name_lower == wanted:
+                return True
+            if name_lower.startswith(wanted + ":"):
+                return True
+        return False
 
     async def generate(self, prompt: str, timeout: float) -> str:
         try:
@@ -34,10 +51,16 @@ class OllamaClient:
             "model": self.model,
             "prompt": prompt,
             "stream": False,
-            "options": {"temperature": self.temperature},
+            "options": {
+                "temperature": self.temperature,
+                # Limit generation to keep latency bounded.
+                "num_predict": 700,
+            },
         }
+
         async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.post(f"{self.base_url}/api/generate", json=payload)
-            response.raise_for_status()
+            if response.status_code >= 400:
+                raise RuntimeError(f"Ollama error {response.status_code}: {response.text[:400]}")
             data = response.json()
             return str(data.get("response", "")).strip()

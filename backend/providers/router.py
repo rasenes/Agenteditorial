@@ -56,9 +56,14 @@ class LLMRouter:
 
             except Exception as exc:  # noqa: BLE001
                 last_error = exc
-                logger.warning("Provider %s failed: %s", provider_name, exc)
+                logger.warning("Provider %s failed: %r", provider_name, exc)
 
-        raise RuntimeError(f"All providers failed. Last error: {last_error}")
+        raise RuntimeError(
+            "No LLM available. "
+            "If you use Ollama: install a model (ex: `ollama pull llama3`) and set OLLAMA_MODEL if needed. "
+            "Or set OPENAI_API_KEY / GROQ_API_KEY. "
+            f"Last error: {last_error!r}"
+        )
 
 
 router = LLMRouter()

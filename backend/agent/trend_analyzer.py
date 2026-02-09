@@ -79,7 +79,8 @@ class TrendAnalyzer:
         return trend
 
     def _detect_theme(self, text: str) -> str:
-        best_theme = "IA"
+        # If no clear signal, default to a neutral bucket instead of forcing IA.
+        best_theme = "Faits surprenants"
         best_hits = 0
         for theme, keywords in self.THEME_KEYWORDS.items():
             hits = sum(1 for kw in keywords if kw in text)

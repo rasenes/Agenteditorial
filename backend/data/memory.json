@@ -109,27 +109,533 @@
         "total": 0.5725
       },
       "created_at": 1770635213.3579931
+    },
+    {
+      "id": "rmx-dba93dfe85fdca42",
+      "text": "Global trend: ce n'est pas juste une news, c'est un signal faible qui va redéfinir le débat des 12 prochains mois ? Voilà le vrai sujet.",
+      "theme": "IA",
+      "style": "story",
+      "language": "fr",
+      "angle": "insight",
+      "source_trend_id": "manual-6012507130835239741",
+      "provider_used": "fallback",
+      "score": 0.6005,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.25,
+        "viral": 0.6000000000000001,
+        "total": 0.6005
+      },
+      "created_at": 1770635742.0387492
+    },
+    {
+      "id": "rmx-0c79a994db44a0e0",
+      "text": "Bien sûr, tout est sous contrôle... sauf que tout le monde regarde global trend, peu voient l'effet secondaire: le vrai gagnant sera celui qui agit avant la foule.",
+      "theme": "IA",
+      "style": "ironique",
+      "language": "fr",
+      "angle": "contradiction",
+      "source_trend_id": "manual-6012507130835239741",
+      "provider_used": "fallback",
+      "score": 0.5907,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 0.92,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.47,
+        "viral": 0.4,
+        "total": 0.5907
+      },
+      "created_at": 1770635742.0389178
+    },
+    {
+      "id": "rmx-f2413197ac35f284",
+      "text": "Bien sûr, tout est sous contrôle... sauf que cuba warns airlines that it will be out of fuel for planes in 24 hours: ce n'est pas juste une news, c'est un signal faible qui va redéfinir le débat des 12 prochains mois.",
+      "theme": "IA",
+      "style": "ironique",
+      "language": "fr",
+      "angle": "insight",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "fallback",
+      "score": 0.6147,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 0.92,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.47,
+        "viral": 0.56,
+        "total": 0.6147
+      },
+      "created_at": 1770635806.6546407
+    },
+    {
+      "id": "rmx-79e261a9988194ce",
+      "text": "Cuba warns airlines that it will be out of fuel for planes in 24 hours: ce n'est pas juste une news, c'est un signal faible qui va redéfinir le débat des 12 prochains mois ? Voilà le vrai sujet.",
+      "theme": "IA",
+      "style": "story",
+      "language": "fr",
+      "angle": "insight",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "fallback",
+      "score": 0.6125,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.25,
+        "viral": 0.68,
+        "total": 0.6125
+      },
+      "created_at": 1770635806.655007
+    },
+    {
+      "id": "rmx-e21e6d041f2f2b29",
+      "text": "Tout le monde regarde Cuba warns airlines that it will be out of fuel for planes in 24 hours, peu voient l'effet secondaire: le vrai gagnant sera celui qui agit avant la foule ? Voilà le vrai sujet.",
+      "theme": "IA",
+      "style": "story",
+      "language": "fr",
+      "angle": "contradiction",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "fallback",
+      "score": 0.6005,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.25,
+        "viral": 0.6000000000000001,
+        "total": 0.6005
+      },
+      "created_at": 1770635806.6553426
+    },
+    {
+      "id": "tw-95ef8443c277b73f",
+      "text": "Japan's Sanae Takaichi wins a landslide in snap election, exit polls project prouve une chose: quand le rythme accélère, l'inaction devient une décision risquée.",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "urgence",
+      "source_trend_id": "reddit-2f6b10101c027beb",
+      "provider_used": "fallback",
+      "score": 0.6005,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.7,
+        "contradiction": 0.25,
+        "viral": 0.4,
+        "total": 0.6005
+      },
+      "created_at": 1770635817.8920357
+    },
+    {
+      "id": "rmx-f94e1e2ceb95b8ce",
+      "text": "Japan's Sanae Takaichi wins a landslide in snap election, exit polls project: ce n'est pas juste une news, c'est un signal faible qui va redéfinir le débat des 12 prochains mois ? Voilà le vrai sujet.",
+      "theme": "IA",
+      "style": "story",
+      "language": "fr",
+      "angle": "insight",
+      "source_trend_id": "reddit-2f6b10101c027beb",
+      "provider_used": "fallback",
+      "score": 0.6005,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.25,
+        "viral": 0.6000000000000001,
+        "total": 0.6005
+      },
+      "created_at": 1770635817.8925457
+    },
+    {
+      "id": "rmx-7683d382c832abb1",
+      "text": "Bien sûr, tout est sous contrôle... sauf que japan's sanae takaichi wins a landslide in snap election, exit polls project prouve une chose: quand le rythme accélère, l'inaction devient une décision risquée.",
+      "theme": "IA",
+      "style": "ironique",
+      "language": "fr",
+      "angle": "urgence",
+      "source_trend_id": "reddit-2f6b10101c027beb",
+      "provider_used": "fallback",
+      "score": 0.5907,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 0.92,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.47,
+        "viral": 0.4,
+        "total": 0.5907
+      },
+      "created_at": 1770635817.8929875
+    },
+    {
+      "id": "tw-3864443ad9e1823b",
+      "text": "Ukraine war must become 'untenable' for Russia, Zelenskyy says after latest strikes prouve une chose: quand le rythme accélère, l'inaction devient une décision risquée.",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "urgence",
+      "source_trend_id": "reddit-c27828d55bed31da",
+      "provider_used": "fallback",
+      "score": 0.6005,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.7,
+        "contradiction": 0.25,
+        "viral": 0.4,
+        "total": 0.6005
+      },
+      "created_at": 1770635828.718292
+    },
+    {
+      "id": "rmx-d204ce338b600581",
+      "text": "Ukraine war must become 'untenable' for Russia, Zelenskyy says after latest strikes: ce n'est pas juste une news, c'est un signal faible qui va redéfinir le débat des 12 prochains mois ? Voilà le vrai sujet.",
+      "theme": "IA",
+      "style": "story",
+      "language": "fr",
+      "angle": "insight",
+      "source_trend_id": "reddit-c27828d55bed31da",
+      "provider_used": "fallback",
+      "score": 0.6005,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.25,
+        "viral": 0.6000000000000001,
+        "total": 0.6005
+      },
+      "created_at": 1770635828.7186522
+    },
+    {
+      "id": "rmx-cfd2c0b05533ba3e",
+      "text": "Bien sûr, tout est sous contrôle... sauf que ukraine war must become 'untenable' for russia, zelenskyy says after latest strikes prouve une chose: quand le rythme accélère, l'inaction devient une décision risquée.",
+      "theme": "IA",
+      "style": "ironique",
+      "language": "fr",
+      "angle": "urgence",
+      "source_trend_id": "reddit-c27828d55bed31da",
+      "provider_used": "fallback",
+      "score": 0.5907,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 0.92,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.47,
+        "viral": 0.4,
+        "total": 0.5907
+      },
+      "created_at": 1770635828.719151
+    },
+    {
+      "id": "tw-c88ae441f6e6c84e",
+      "text": "Iran sentences Nobel laureate Narges Mohammadi to seven more years in prison prouve une chose: quand le rythme accélère, l'inaction devient une décision risquée.",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "urgence",
+      "source_trend_id": "reddit-98400757dc179423",
+      "provider_used": "fallback",
+      "score": 0.6005,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.7,
+        "contradiction": 0.25,
+        "viral": 0.4,
+        "total": 0.6005
+      },
+      "created_at": 1770635839.5582538
+    },
+    {
+      "id": "rmx-5b8cbed80f500a45",
+      "text": "Iran sentences Nobel laureate Narges Mohammadi to seven more years in prison: ce n'est pas juste une news, c'est un signal faible qui va redéfinir le débat des 12 prochains mois ? Voilà le vrai sujet.",
+      "theme": "IA",
+      "style": "story",
+      "language": "fr",
+      "angle": "insight",
+      "source_trend_id": "reddit-98400757dc179423",
+      "provider_used": "fallback",
+      "score": 0.6005,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.25,
+        "viral": 0.6000000000000001,
+        "total": 0.6005
+      },
+      "created_at": 1770635839.5589254
+    },
+    {
+      "id": "rmx-03e6031c3a538087",
+      "text": "Bien sûr, tout est sous contrôle... sauf que iran sentences nobel laureate narges mohammadi to seven more years in prison prouve une chose: quand le rythme accélère, l'inaction devient une décision risquée.",
+      "theme": "IA",
+      "style": "ironique",
+      "language": "fr",
+      "angle": "urgence",
+      "source_trend_id": "reddit-98400757dc179423",
+      "provider_used": "fallback",
+      "score": 0.5907,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 0.92,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.47,
+        "viral": 0.4,
+        "total": 0.5907
+      },
+      "created_at": 1770635839.5595748
+    },
+    {
+      "id": "rmx-9b46e2df64cd2e0f",
+      "text": "Bien sûr, tout est sous contrôle... sauf que uk threatens seizure of russian shadow fleet tankers, the guardian says: ce n'est pas juste une news, c'est un signal faible qui va redéfinir le débat des 12 prochains mois.",
+      "theme": "IA",
+      "style": "ironique",
+      "language": "fr",
+      "angle": "insight",
+      "source_trend_id": "reddit-f313a5dd04027d9d",
+      "provider_used": "fallback",
+      "score": 0.6027,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 0.92,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.47,
+        "viral": 0.48000000000000004,
+        "total": 0.6027
+      },
+      "created_at": 1770635849.0290563
+    },
+    {
+      "id": "tw-d41f112f13ee6bcd",
+      "text": "UK threatens seizure of Russian shadow fleet tankers, The Guardian says prouve une chose: quand le rythme accélère, l'inaction devient une décision risquée.",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "urgence",
+      "source_trend_id": "reddit-f313a5dd04027d9d",
+      "provider_used": "fallback",
+      "score": 0.6005,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.7,
+        "contradiction": 0.25,
+        "viral": 0.4,
+        "total": 0.6005
+      },
+      "created_at": 1770635849.0296333
+    },
+    {
+      "id": "rmx-69473ca1bd863e79",
+      "text": "UK threatens seizure of Russian shadow fleet tankers, The Guardian says: ce n'est pas juste une news, c'est un signal faible qui va redéfinir le débat des 12 prochains mois ? Voilà le vrai sujet.",
+      "theme": "IA",
+      "style": "story",
+      "language": "fr",
+      "angle": "insight",
+      "source_trend_id": "reddit-f313a5dd04027d9d",
+      "provider_used": "fallback",
+      "score": 0.6005,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.25,
+        "viral": 0.6000000000000001,
+        "total": 0.6005
+      },
+      "created_at": 1770635849.0303066
+    },
+    {
+      "id": "tw-6329d1d38335e08a",
+      "text": "Alarme à Cuba : pas assez de carburant pour les avions dans 24 heures. La révolution numérique attendue ? #IA #Cuba",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "visionnaire",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.6268,
+      "breakdown": {
+        "length": 0.8,
+        "clarity": 0.88,
+        "emotion": 0.55,
+        "mirror": 0.35,
+        "punchline": 0.7,
+        "contradiction": 0.25,
+        "viral": 0.76,
+        "total": 0.6268
+      },
+      "created_at": 1770636592.751235
+    },
+    {
+      "id": "tw-068c1c015abd3104",
+      "text": "En attendant de savoir comment les airlines seront ravitaillées en carburant à Cuba, l'intelligence artificielle pourrait-elle trouver une solution ? #IA #Cuba",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "lucide",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.62,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.55,
+        "contradiction": 0.25,
+        "viral": 0.68,
+        "total": 0.62
+      },
+      "created_at": 1770636592.7518315
+    },
+    {
+      "id": "tw-b086577e34447a88",
+      "text": "Le rationnement énergétique en cours à Cuba : un test de l'intelligence artificielle pour les airlines ? #IA #Cuba",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "concret",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.6145,
+      "breakdown": {
+        "length": 0.8,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.7,
+        "contradiction": 0.25,
+        "viral": 0.68,
+        "total": 0.6145
+      },
+      "created_at": 1770636592.7523668
+    },
+    {
+      "id": "tw-482f8a02918cf11b",
+      "text": "Alerte rouge : les vols vers Cuba sont en danger de se trouver sans carburant ! Mais quels sont les chiffres réels derrière ce manque d'essence ?",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "question",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.683,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.63,
+        "mirror": 0.35,
+        "punchline": 0.7000000000000001,
+        "contradiction": 0.47,
+        "viral": 0.52,
+        "total": 0.683
+      },
+      "created_at": 1770636758.0110672
+    },
+    {
+      "id": "tw-b9522f31407ac00b",
+      "text": "Cuba alerte les compagnies aériennes : pas assez de carburant pour demain. Une nation entière risque d'être immobilisée. Quel est notre rôle dans cette crise ?",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "urgence",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.6188,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 0.88,
+        "emotion": 0.55,
+        "mirror": 0.35,
+        "punchline": 0.7000000000000001,
+        "contradiction": 0.25,
+        "viral": 0.52,
+        "total": 0.6188
+      },
+      "created_at": 1770636758.0115108
+    },
+    {
+      "id": "tw-bb7acfa786388912",
+      "text": "La crise carburant à Cuba est une urgence pour toute l'industrie aérienne. Mais les solutions proposées n'ont pas d'avenir : le pétrole ne sera plus disponible pour l'aviation en 2050.",
+      "theme": "IA",
+      "style": "insight",
+      "language": "fr",
+      "angle": "punchline",
+      "source_trend_id": "reddit-6f3c5a663aa9ad4d",
+      "provider_used": "ollama",
+      "score": 0.6155,
+      "breakdown": {
+        "length": 1.0,
+        "clarity": 1.0,
+        "emotion": 0.42,
+        "mirror": 0.35,
+        "punchline": 0.5,
+        "contradiction": 0.47,
+        "viral": 0.48000000000000004,
+        "total": 0.6155
+      },
+      "created_at": 1770636758.0119948
     }
   ],
   "favorites": [],
   "style_stats": {
     "story": {
-      "count": 2,
-      "score_sum": 1.219
+      "count": 9,
+      "score_sum": 5.434500000000002
     },
     "ironique": {
-      "count": 1,
-      "score_sum": 0.6027
+      "count": 7,
+      "score_sum": 4.1829
     },
     "insight": {
-      "count": 2,
-      "score_sum": 1.157
+      "count": 12,
+      "score_sum": 7.337600000000001
     }
   },
   "theme_heatmap": {
     "IA": {
-      "count": 3,
-      "score_sum": 1.8217
+      "count": 26,
+      "score_sum": 15.798000000000002
     },
     "string": {
       "count": 2,
@@ -175,6 +681,110 @@
         "tw-7a974f1503c5c5dd"
       ],
       "top_score": 0.5845
+    },
+    {
+      "id": "hist-1770635742038",
+      "theme": "IA",
+      "trend_text": "Global trend",
+      "draft_mode": false,
+      "created_at": 1770635742.03857,
+      "tweet_ids": [
+        "rmx-3465f7150778a55b",
+        "rmx-dba93dfe85fdca42",
+        "rmx-0c79a994db44a0e0"
+      ],
+      "top_score": 0.6027
+    },
+    {
+      "id": "hist-1770635806654",
+      "theme": "IA",
+      "trend_text": "Cuba warns airlines that it will be out of fuel for planes in 24 hours",
+      "draft_mode": false,
+      "created_at": 1770635806.6541564,
+      "tweet_ids": [
+        "rmx-f2413197ac35f284",
+        "rmx-79e261a9988194ce",
+        "rmx-e21e6d041f2f2b29"
+      ],
+      "top_score": 0.6147
+    },
+    {
+      "id": "hist-1770635817891",
+      "theme": "IA",
+      "trend_text": "Japan's Sanae Takaichi wins a landslide in snap election, exit polls project",
+      "draft_mode": false,
+      "created_at": 1770635817.8915758,
+      "tweet_ids": [
+        "tw-95ef8443c277b73f",
+        "rmx-f94e1e2ceb95b8ce",
+        "rmx-7683d382c832abb1"
+      ],
+      "top_score": 0.6005
+    },
+    {
+      "id": "hist-1770635828717",
+      "theme": "IA",
+      "trend_text": "Ukraine war must become 'untenable' for Russia, Zelenskyy says after latest strikes",
+      "draft_mode": false,
+      "created_at": 1770635828.7178779,
+      "tweet_ids": [
+        "tw-3864443ad9e1823b",
+        "rmx-d204ce338b600581",
+        "rmx-cfd2c0b05533ba3e"
+      ],
+      "top_score": 0.6005
+    },
+    {
+      "id": "hist-1770635839557",
+      "theme": "IA",
+      "trend_text": "Iran sentences Nobel laureate Narges Mohammadi to seven more years in prison",
+      "draft_mode": false,
+      "created_at": 1770635839.5576205,
+      "tweet_ids": [
+        "tw-c88ae441f6e6c84e",
+        "rmx-5b8cbed80f500a45",
+        "rmx-03e6031c3a538087"
+      ],
+      "top_score": 0.6005
+    },
+    {
+      "id": "hist-1770635849028",
+      "theme": "IA",
+      "trend_text": "UK threatens seizure of Russian shadow fleet tankers, The Guardian says",
+      "draft_mode": false,
+      "created_at": 1770635849.0284083,
+      "tweet_ids": [
+        "rmx-9b46e2df64cd2e0f",
+        "tw-d41f112f13ee6bcd",
+        "rmx-69473ca1bd863e79"
+      ],
+      "top_score": 0.6027
+    },
+    {
+      "id": "hist-1770636592750",
+      "theme": "IA",
+      "trend_text": "Cuba warns airlines that it will be out of fuel for planes in 24 hours",
+      "draft_mode": false,
+      "created_at": 1770636592.7505412,
+      "tweet_ids": [
+        "tw-6329d1d38335e08a",
+        "tw-068c1c015abd3104",
+        "tw-b086577e34447a88"
+      ],
+      "top_score": 0.6268
+    },
+    {
+      "id": "hist-1770636758010",
+      "theme": "IA",
+      "trend_text": "Cuba warns airlines that it will be out of fuel for planes in 24 hours",
+      "draft_mode": false,
+      "created_at": 1770636758.0105665,
+      "tweet_ids": [
+        "tw-482f8a02918cf11b",
+        "tw-b9522f31407ac00b",
+        "tw-bb7acfa786388912"
+      ],
+      "top_score": 0.683
     }
   ],
   "ab_tests": [
@@ -190,5 +800,5 @@
       "created_at": 1770635224.452364
     }
   ],
-  "updated_at": 1770635224.4523861
+  "updated_at": 1770636758.0119987
 }

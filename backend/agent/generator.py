@@ -1,6 +1,5 @@
 ﻿from __future__ import annotations
 
-import asyncio
 import json
 from typing import Any
 
@@ -11,7 +10,6 @@ from ..models.tweet import GenerateTweetsRequest, TweetCandidate
 from ..models.trend import Trend
 from ..providers import router
 from .memory_engine import memory_engine
-from .translator import translator
 
 logger = get_logger(__name__)
 
@@ -33,64 +31,50 @@ class TweetGenerator:
         "Futur": "prospectif, concret",
     }
 
+    ALLOWED_ANGLES = {"insight", "contradiction", "question", "punchline", "data", "ironie", "urgence", "surprise"}
+
     async def generate_candidates(self, request: GenerateTweetsRequest, trend: Trend) -> list[TweetCandidate]:
-        per_batch = max(3, request.count // 3)
-        prompts = [
-            self._build_prompt(request=request, trend=trend, n=per_batch, seed=idx)
-            for idx in range(3)
-        ]
+        prompt = self._build_prompt(request=request, trend=trend, n=request.count)
+        result = await router.generate(prompt)
 
-        semaphore = asyncio.Semaphore(SETTINGS.generation.max_parallel_generations)
-
-        async def run_prompt(prompt: str) -> tuple[str, str]:
-            async with semaphore:
-                try:
-                    result = await router.generate(prompt)
-                    return result.text, result.provider
-                except Exception as exc:  # noqa: BLE001
-                    logger.warning("LLM generation failed, fallback in use: %s", exc)
-                    return self._fallback_payload(prompt, per_batch), "fallback"
-
-        outputs = await asyncio.gather(*(run_prompt(prompt) for prompt in prompts), return_exceptions=False)
-
-        candidates: list[TweetCandidate] = []
-        for text, provider in outputs:
-            candidates.extend(self._to_candidates(raw=text, provider=provider, request=request, trend=trend))
+        candidates = self._to_candidates(raw=result.text, provider=result.provider, request=request, trend=trend)
+        if not candidates:
+            raise RuntimeError("LLM returned no usable tweets")
 
         deduped = self._dedupe(candidates)
-        final = deduped[: request.count]
+        if len(deduped) < request.count:
+            deduped.extend(self._fallback_candidates(trend=trend, request=request, missing=request.count - len(deduped)))
 
-        if request.language != "fr":
-            await self._translate_candidates(final, request.language)
+        return deduped[: request.count]
 
-        return final
-
-    def _build_prompt(self, request: GenerateTweetsRequest, trend: Trend, n: int, seed: int) -> str:
+    def _build_prompt(self, request: GenerateTweetsRequest, trend: Trend, n: int) -> str:
         tone = self.THEME_TONE.get(request.theme, "direct")
         avoid = memory_engine.get_similar_texts(trend.title, threshold=0.7)[:4]
-
         avoid_block = "\n".join(f"- {line}" for line in avoid) if avoid else "- Aucun"
+
         return (
-            "Tu es un agent éditorial expert des tweets viraux.\n"
-            f"Thème: {request.theme}\n"
+            "Tu es un ghostwriter FR expert en tweets viraux.\n"
+            "Tu ecris UNIQUEMENT en francais naturel (pas une traduction).\n\n"
+            f"Theme: {request.theme}\n"
             f"Style: {request.style}\n"
             f"Angle viral principal: {trend.viral_angle}\n"
-            f"Ton éditorial: {tone}\n"
+            f"Ton editorial: {tone}\n"
             f"Sujet: {trend.title}\n"
             f"Contexte: {trend.summary}\n"
-            f"Langue de sortie: {request.language}\n"
-            f"Nombre de tweets: {n}\n"
-            f"Seed créative: {seed}\n"
+            f"Nombre de tweets: {n}\n\n"
             "Contraintes strictes:\n"
-            "- 280 caractères maximum\n"
-            "- 1 idée forte par tweet\n"
+            "- 280 caracteres maximum\n"
+            "- 1 idee forte par tweet\n"
             "- pas de markdown\n"
             "- pas de guillemets autour des phrases\n"
-            "- si possible, inclure un contraste, un chiffre, ou une punchline\n"
-            "- éviter les répétitions avec ces exemples historiques:\n"
+            "- concret, specifique, avec un twist\n"
+            "- 0 a 2 hashtags MAX et seulement si pertinents\n"
+            "- ne PAS ajouter #IA si le sujet n'est pas l'IA\n"
+            "- angle OBLIGATOIRE dans cette liste: insight, contradiction, question, punchline, data, ironie, urgence, surprise\n"
+            "- eviter les repetitions avec ces exemples historiques:\n"
             f"{avoid_block}\n\n"
-            "Réponds en JSON strict sous forme de tableau:"
-            " [{\"text\":\"...\",\"angle\":\"...\"}]"
+            "Reponds UNIQUEMENT en JSON strict (tableau) :"
+            " [{\"text\":\"...\",\"angle\":\"insight|contradiction|question|punchline|data|ironie|urgence|surprise\"}]"
         )
 
     def _to_candidates(
@@ -118,23 +102,25 @@ class TweetGenerator:
                 continue
             if len(text) > 280:
                 text = text[:277] + "..."
-            candidate = TweetCandidate(
-                id=f"tw-{short_hash(text + trend.id)}",
-                text=text,
-                theme=request.theme,
-                style=request.style,
-                language="fr",
-                angle=str(row.get("angle", trend.viral_angle))[:40],
-                source_trend_id=trend.id,
-                provider_used=provider,
-            )
-            candidates.append(candidate)
-        return candidates
 
-    async def _translate_candidates(self, candidates: list[TweetCandidate], source_language: str) -> None:
-        for candidate in candidates:
-            candidate.text = await translator.to_french(candidate.text, source_language)
-            candidate.language = "fr"
+            angle = str(row.get("angle", trend.viral_angle)).strip().lower()
+            if angle not in self.ALLOWED_ANGLES:
+                angle = trend.viral_angle
+
+            candidates.append(
+                TweetCandidate(
+                    id=f"tw-{short_hash(text + trend.id)}",
+                    text=text,
+                    theme=request.theme,
+                    style=request.style,
+                    language="fr",
+                    angle=angle[:40],
+                    source_trend_id=trend.id,
+                    provider_used=provider,
+                )
+            )
+
+        return candidates
 
     def _dedupe(self, tweets: list[TweetCandidate]) -> list[TweetCandidate]:
         seen: set[str] = set()
@@ -147,27 +133,24 @@ class TweetGenerator:
             deduped.append(tweet)
         return deduped
 
-    def _fallback_payload(self, prompt: str, n: int) -> str:
-        topic = "actualité"
-        for line in prompt.splitlines():
-            if line.startswith("Sujet:"):
-                topic = line.replace("Sujet:", "").strip()
-                break
-        rows = [
+    def _fallback_candidates(self, trend: Trend, request: GenerateTweetsRequest, missing: int) -> list[TweetCandidate]:
+        base = [
             {
-                "text": f"{topic}: ce n'est pas juste une news, c'est un signal faible qui va redéfinir le débat des 12 prochains mois.",
+                "text": f"{trend.title}: ce n'est pas juste une news, c'est un signal faible qui va reconfigurer les priorites. Et peu de gens le voient venir.",
                 "angle": "insight",
             },
             {
-                "text": f"Tout le monde regarde {topic}, peu voient l'effet secondaire: le vrai gagnant sera celui qui agit avant la foule.",
+                "text": f"Tout le monde parle de {trend.title}. Le vrai sujet, c'est l'effet secondaire. Celui qui le comprend maintenant aura 6 mois d'avance.",
                 "angle": "contradiction",
             },
             {
-                "text": f"{topic} prouve une chose: quand le rythme accélère, l'inaction devient une décision risquée.",
-                "angle": "urgence",
+                "text": f"{trend.title} pose une question simple: tu veux avoir raison plus tard, ou agir pendant que c'est encore possible ?",
+                "angle": "question",
             },
         ]
-        return json.dumps(rows[:n], ensure_ascii=False)
+        rows = base[:missing]
+        raw = json.dumps(rows, ensure_ascii=False)
+        return self._to_candidates(raw=raw, provider="fallback", request=request, trend=trend)
 
 
 generator = TweetGenerator()
