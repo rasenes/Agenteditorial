@@ -1,17 +1,39 @@
 ﻿from __future__ import annotations
 
+"""FastAPI entrypoint.
+
+Supports 2 launch modes:
+1) From repo root (recommended):
+   `python -m uvicorn backend.main:app --reload`
+2) From the backend/ folder (works too):
+   `python -m uvicorn main:app --reload`
+
+This file uses absolute imports (`backend.*`) for stability.
+"""
+
 from contextlib import asynccontextmanager
+
+# If imported as a top-level module (e.g. `uvicorn main:app` from backend/),
+# relative imports would fail because Python doesn't know the parent package.
+# Add repo root to sys.path to keep startup robust.
+if __package__ in (None, ""):
+    import sys
+    from pathlib import Path
+
+    repo_root = Path(__file__).resolve().parents[1]
+    if str(repo_root) not in sys.path:
+        sys.path.insert(0, str(repo_root))
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .agent.orchestrator import orchestrator
-from .api.routes_admin import router as admin_router
-from .api.routes_generate import router as generate_router
-from .api.routes_memory import router as memory_router
-from .api.routes_trends import router as trends_router
-from .core.config import SETTINGS
-from .core.logger import get_logger
+from backend.agent.orchestrator import orchestrator
+from backend.api.routes_admin import router as admin_router
+from backend.api.routes_generate import router as generate_router
+from backend.api.routes_memory import router as memory_router
+from backend.api.routes_trends import router as trends_router
+from backend.core.config import SETTINGS
+from backend.core.logger import get_logger
 
 logger = get_logger(__name__)
 
