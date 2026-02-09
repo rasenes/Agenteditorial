@@ -1,257 +1,173 @@
-﻿"""
-Générateur de tweets IA.
-Crée des tweets à partir de tendances avec différents styles.
-"""
+﻿from __future__ import annotations
 
 import asyncio
-from typing import List, Optional
 import json
+from typing import Any
 
+from ..core.config import SETTINGS
 from ..core.logger import get_logger
-from ..core.utils import extract_json, truncate_text, validate_tweet, clean_text
-from ..models.tweet import Tweet, Trend, GenerationRequest, GenerationResponse
-from ..providers.router import router
+from ..core.utils import normalize_text, parse_json_loose, short_hash
+from ..models.tweet import GenerateTweetsRequest, TweetCandidate
+from ..models.trend import Trend
+from ..providers import router
+from .memory_engine import memory_engine
+from .translator import translator
 
 logger = get_logger(__name__)
 
 
 class TweetGenerator:
-    """Génère des tweets à partir de tendances."""
-    
-    # Templates par style
-    STYLE_TEMPLATES = {
-        "normal": """Generate {count} professional and engaging tweets about: {topic}
-        
-Requirements:
-- Clear and informative
-- Optimized for X/Twitter (280 chars max)
-- Include relevant hashtags
-- Natural French
-- Varied angles
-
-Format as JSON array with 'content' field for each tweet.""",
-        
-        "aggressive": """Generate {count} provocative and bold tweets about: {topic}
-        
-Requirements:
-- Direct and assertive
-- Challenge assumptions
-- Create debate
-- Stay respectful but daring
-- Natural French
-
-Format as JSON array with 'content' field.""",
-        
-        "funny": """Generate {count} humorous and witty tweets about: {topic}
-        
-Requirements:
-- Clever wordplay or observations
-- Light and entertaining
-- Relatable humor
-- Natural French
-
-Format as JSON array with 'content' field.""",
-        
-        "minimal": """Generate {count} ultra-short tweets about: {topic}
-        
-Requirements:
-- Less than 150 characters
-- Punchy and memorable
-- Direct impact
-- Minimal words
-- Natural French
-
-Format as JSON array with 'content' field.""",
-        
-        "data": """Generate {count} fact-based tweets about: {topic}
-        
-Requirements:
-- Include numbers or statistics
-- Backed by data
-- Informative
-- Professional tone
-- Natural French
-
-Format as JSON array with 'content' field.""",
+    THEME_TONE: dict[str, str] = {
+        "IA": "visionnaire, concret, lucide",
+        "Tech": "analytique et direct",
+        "Science": "pédagogique mais percutant",
+        "Sport": "énergique, compétitif",
+        "Politique": "tranché, argumenté",
+        "Business": "stratégique, orienté résultats",
+        "Crypto": "audacieux, orienté risque",
+        "Univers": "émerveillé, précis",
+        "Culture": "narratif et sensoriel",
+        "Humour": "drôle, sec, mémorable",
+        "Faits surprenants": "curieux et punchy",
+        "Philosophie": "réflexif, paradoxal",
+        "Futur": "prospectif, concret",
     }
-    
-    THEME_PROMPTS = {
-        "IA": "You are a tech influencer discussing AI breakthroughs",
-        "Tech": "You are a tech industry expert discussing innovations",
-        "Science": "You are a science communicator explaining discoveries",
-        "Sport": "You are a sports commentator discussing sports news",
-        "Politique": "You are a political analyst discussing current events",
-        "Business": "You are a business strategist discussing entrepreneurship",
-        "Crypto": "You are a crypto analyst discussing blockchain",
-        "Univers": "You are a space enthusiast discussing astronomy",
-        "Culture": "You are a cultural critic discussing arts and entertainment",
-        "Humour": "You are a comedian and humorist",
-        "Fait": "You are sharing surprising and interesting facts",
-        "Philosophie": "You are a philosopher discussing ideas and existence",
-        "Futur": "You are a futurist discussing tomorrow's world",
-        "general": "You are a social media expert creating engaging content",
-    }
-    
-    def __init__(self):
-        self.router = router
-    
-    async def generate(self, request: GenerationRequest) -> GenerationResponse:
-        """
-        Génère des tweets pour une requête.
-        
-        Args:
-            request: Requête de génération
-        
-        Returns:
-            Réponse avec tweets générés
-        """
-        start_time = asyncio.get_event_loop().time()
-        
-        try:
-            # Prépare le contexte
-            topic = ""
-            if request.trend:
-                topic = f"{request.trend.title}\n{request.trend.description}"
-            
-            if not topic:
-                topic = f"Topic: {request.theme}"
-            
-            # Build prompt
-            theme_context = self.THEME_PROMPTS.get(request.theme, self.THEME_PROMPTS["general"])
-            style_template = self.STYLE_TEMPLATES.get(request.style, self.STYLE_TEMPLATES["normal"])
-            
-            prompt = f"""{theme_context}
 
-Generate engaging tweets in French about:
-{topic}
-
-{style_template.format(count=request.count, topic=topic)}
-
-Respond ONLY with valid JSON array, no other text."""
-            
-            # Génère avec LLM
-            logger.info(f"Generating {request.count} tweets (style: {request.style}, theme: {request.theme})")
-            response_text = await self.router.generate(
-                prompt,
-                temperature=0.7,
-                max_tokens=800,
-            )
-            
-            # Parse JSON
-            json_data = self._parse_response(response_text)
-            
-            if not json_data:
-                logger.error(f"Failed to parse LLM response: {response_text[:100]}")
-                # Fallback simple
-                tweets = [
-                    Tweet(
-                        content=truncate_text(topic, 250),
-                        theme=request.theme,
-                        language=request.language,
-                    )
-                ]
-            else:
-                tweets = []
-                for item in json_data:
-                    if isinstance(item, dict):
-                        content = item.get("content", "") or item.get("text", "")
-                    else:
-                        content = str(item)
-                    
-                    if content:
-                        content = clean_text(content)
-                        is_valid, msg = validate_tweet(content)
-                        
-                        if is_valid:
-                            tweet = Tweet(
-                                content=content,
-                                theme=request.theme,
-                                language=request.language,
-                                source="generated",
-                            )
-                            tweets.append(tweet)
-                
-                # Ensure minimum tweets
-                while len(tweets) < request.count:
-                    tweets.append(Tweet(
-                        content=truncate_text(topic, 250),
-                        theme=request.theme,
-                        language=request.language,
-                    ))
-                
-                tweets = tweets[:request.count]
-            
-            elapsed = asyncio.get_event_loop().time() - start_time
-            
-            return GenerationResponse(
-                tweets=tweets,
-                trend=request.trend,
-                total_time=elapsed,
-                model="llm-default",
-            )
-        
-        except Exception as e:
-            logger.error(f"Generation failed: {e}")
-            elapsed = asyncio.get_event_loop().time() - start_time
-            
-            return GenerationResponse(
-                tweets=[],
-                trend=request.trend,
-                total_time=elapsed,
-                model="error",
-                metadata={"error": str(e)},
-            )
-    
-    def _parse_response(self, response: str) -> Optional[List]:
-        """Parse la réponse JSON du LLM."""
-        try:
-            # Essaie JSON direct
-            return json.loads(response)
-        except:
-            pass
-        
-        # Essaie extract_json
-        data = extract_json(response)
-        if data:
-            if isinstance(data, list):
-                return data
-            elif isinstance(data, dict) and "tweets" in data:
-                return data["tweets"]
-        
-        return None
-    
-    async def generate_batch(
-        self,
-        trends: List[Trend],
-        theme: str = "general",
-        style: str = "normal",
-        count_per_trend: int = 2,
-    ) -> List[GenerationResponse]:
-        """
-        Génère des tweets pour plusieurs tendances.
-        
-        Args:
-            trends: Listes de tendances
-            theme: Thème
-            style: Style de génération
-            count_per_trend: Nombre de tweets par tendance
-        
-        Returns:
-            Listes de réponses
-        """
-        requests = [
-            GenerationRequest(
-                trend=trend,
-                theme=trend.category if hasattr(trend, 'category') else theme,
-                count=count_per_trend,
-                style=style,
-            )
-            for trend in trends
+    async def generate_candidates(self, request: GenerateTweetsRequest, trend: Trend) -> list[TweetCandidate]:
+        per_batch = max(3, request.count // 3)
+        prompts = [
+            self._build_prompt(request=request, trend=trend, n=per_batch, seed=idx)
+            for idx in range(3)
         ]
-        
-        tasks = [self.generate(req) for req in requests]
-        return await asyncio.gather(*tasks, return_exceptions=True)
+
+        semaphore = asyncio.Semaphore(SETTINGS.generation.max_parallel_generations)
+
+        async def run_prompt(prompt: str) -> tuple[str, str]:
+            async with semaphore:
+                try:
+                    result = await router.generate(prompt)
+                    return result.text, result.provider
+                except Exception as exc:  # noqa: BLE001
+                    logger.warning("LLM generation failed, fallback in use: %s", exc)
+                    return self._fallback_payload(prompt, per_batch), "fallback"
+
+        outputs = await asyncio.gather(*(run_prompt(prompt) for prompt in prompts), return_exceptions=False)
+
+        candidates: list[TweetCandidate] = []
+        for text, provider in outputs:
+            candidates.extend(self._to_candidates(raw=text, provider=provider, request=request, trend=trend))
+
+        deduped = self._dedupe(candidates)
+        final = deduped[: request.count]
+
+        if request.language != "fr":
+            await self._translate_candidates(final, request.language)
+
+        return final
+
+    def _build_prompt(self, request: GenerateTweetsRequest, trend: Trend, n: int, seed: int) -> str:
+        tone = self.THEME_TONE.get(request.theme, "direct")
+        avoid = memory_engine.get_similar_texts(trend.title, threshold=0.7)[:4]
+
+        avoid_block = "\n".join(f"- {line}" for line in avoid) if avoid else "- Aucun"
+        return (
+            "Tu es un agent éditorial expert des tweets viraux.\n"
+            f"Thème: {request.theme}\n"
+            f"Style: {request.style}\n"
+            f"Angle viral principal: {trend.viral_angle}\n"
+            f"Ton éditorial: {tone}\n"
+            f"Sujet: {trend.title}\n"
+            f"Contexte: {trend.summary}\n"
+            f"Langue de sortie: {request.language}\n"
+            f"Nombre de tweets: {n}\n"
+            f"Seed créative: {seed}\n"
+            "Contraintes strictes:\n"
+            "- 280 caractères maximum\n"
+            "- 1 idée forte par tweet\n"
+            "- pas de markdown\n"
+            "- pas de guillemets autour des phrases\n"
+            "- si possible, inclure un contraste, un chiffre, ou une punchline\n"
+            "- éviter les répétitions avec ces exemples historiques:\n"
+            f"{avoid_block}\n\n"
+            "Réponds en JSON strict sous forme de tableau:"
+            " [{\"text\":\"...\",\"angle\":\"...\"}]"
+        )
+
+    def _to_candidates(
+        self,
+        raw: str,
+        provider: str,
+        request: GenerateTweetsRequest,
+        trend: Trend,
+    ) -> list[TweetCandidate]:
+        payload: Any = parse_json_loose(raw)
+        rows: list[dict[str, Any]] = []
+
+        if isinstance(payload, list):
+            rows = [row for row in payload if isinstance(row, dict) and row.get("text")]
+        elif isinstance(payload, dict) and isinstance(payload.get("tweets"), list):
+            rows = [row for row in payload["tweets"] if isinstance(row, dict) and row.get("text")]
+
+        if not rows:
+            rows = [{"text": line.strip(), "angle": trend.viral_angle} for line in raw.split("\n") if len(line.strip()) > 12]
+
+        candidates: list[TweetCandidate] = []
+        for row in rows:
+            text = normalize_text(str(row.get("text", "")))
+            if not text:
+                continue
+            if len(text) > 280:
+                text = text[:277] + "..."
+            candidate = TweetCandidate(
+                id=f"tw-{short_hash(text + trend.id)}",
+                text=text,
+                theme=request.theme,
+                style=request.style,
+                language="fr",
+                angle=str(row.get("angle", trend.viral_angle))[:40],
+                source_trend_id=trend.id,
+                provider_used=provider,
+            )
+            candidates.append(candidate)
+        return candidates
+
+    async def _translate_candidates(self, candidates: list[TweetCandidate], source_language: str) -> None:
+        for candidate in candidates:
+            candidate.text = await translator.to_french(candidate.text, source_language)
+            candidate.language = "fr"
+
+    def _dedupe(self, tweets: list[TweetCandidate]) -> list[TweetCandidate]:
+        seen: set[str] = set()
+        deduped: list[TweetCandidate] = []
+        for tweet in tweets:
+            key = short_hash(tweet.text)
+            if key in seen:
+                continue
+            seen.add(key)
+            deduped.append(tweet)
+        return deduped
+
+    def _fallback_payload(self, prompt: str, n: int) -> str:
+        topic = "actualité"
+        for line in prompt.splitlines():
+            if line.startswith("Sujet:"):
+                topic = line.replace("Sujet:", "").strip()
+                break
+        rows = [
+            {
+                "text": f"{topic}: ce n'est pas juste une news, c'est un signal faible qui va redéfinir le débat des 12 prochains mois.",
+                "angle": "insight",
+            },
+            {
+                "text": f"Tout le monde regarde {topic}, peu voient l'effet secondaire: le vrai gagnant sera celui qui agit avant la foule.",
+                "angle": "contradiction",
+            },
+            {
+                "text": f"{topic} prouve une chose: quand le rythme accélère, l'inaction devient une décision risquée.",
+                "angle": "urgence",
+            },
+        ]
+        return json.dumps(rows[:n], ensure_ascii=False)
 
 
-# Instance globale
 generator = TweetGenerator()

@@ -1,181 +1,160 @@
-"""
-Configuration centralisée pour l'application Editorial Agent.
-Charge depuis settings.yaml et variables d'environnement.
-"""
+﻿from __future__ import annotations
 
 import os
-import yaml
-from pathlib import Path
-from typing import Optional
 from dataclasses import dataclass, field
-from dotenv import load_dotenv
+from pathlib import Path
+from typing import Any
+
+import yaml
+
+try:
+    from dotenv import load_dotenv
+except Exception:  # noqa: BLE001
+    def load_dotenv() -> None:
+        return None
+
 
 load_dotenv()
 
 
 @dataclass
-class LLMConfig:
-    """Configuration LLM provider."""
-    provider: str = "ollama"  # ollama, openai, groq
-    model: str = "mistral"
-    temperature: float = 0.7
-    max_tokens: int = 500
-    timeout: int = 30
+class AppMetaConfig:
+    app_name: str = "Editorial Agent IA"
+    version: str = "2.0.0"
+    debug: bool = False
+    environment: str = "development"
+    log_level: str = "INFO"
+
+
+@dataclass
+class APIConfig:
+    host: str = "0.0.0.0"
+    port: int = 8000
+    prefix: str = "/api/v1"
+    cors_origins: list[str] = field(default_factory=lambda: ["*"])
+
+
+@dataclass
+class LLMRuntimeConfig:
+    primary_provider: str = "ollama"
+    fallback_order: list[str] = field(default_factory=lambda: ["ollama", "openai", "groq"])
+    request_timeout_sec: float = 4.0
+    max_retries: int = 1
 
 
 @dataclass
 class OllamaConfig:
-    """Configuration Ollama."""
     base_url: str = "http://localhost:11434"
-    model: str = "mistral"
+    model: str = "llama3.1:8b"
     temperature: float = 0.7
-    timeout: int = 30
 
 
 @dataclass
 class OpenAIConfig:
-    """Configuration OpenAI."""
     api_key: str = ""
-    model: str = "gpt-3.5-turbo"
+    model: str = "gpt-4o-mini"
     temperature: float = 0.7
-    timeout: int = 30
 
 
 @dataclass
 class GroqConfig:
-    """Configuration Groq."""
     api_key: str = ""
-    model: str = "mixtral-8x7b-32768"
+    model: str = "llama-3.3-70b-versatile"
     temperature: float = 0.7
-    timeout: int = 30
 
 
 @dataclass
 class SourcesConfig:
-    """Configuration des sources de tendances."""
-    rss_feeds: list = field(default_factory=list)
+    rss_feeds: list[str] = field(
+        default_factory=lambda: [
+            "https://feeds.bbci.co.uk/news/world/rss.xml",
+            "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
+            "https://www.reddit.com/r/worldnews/.rss",
+        ]
+    )
     newsapi_key: str = ""
-    reddit_enabled: bool = False
-    twitter_enabled: bool = False
-    youtube_enabled: bool = False
-    update_interval: int = 3600  # secondes
+    reddit_client_id: str = ""
+    reddit_client_secret: str = ""
+    reddit_user_agent: str = "editorial-agent/1.0"
+    enable_twitter_trends: bool = False
+    enable_youtube_trends: bool = False
+    max_trends_per_source: int = 20
 
 
 @dataclass
 class MemoryConfig:
-    """Configuration mémoire."""
-    enabled: bool = True
     path: str = "backend/data/memory.json"
-    max_size: int = 10000
-    cleanup_interval: int = 86400  # 24h
+    max_tweets: int = 2000
+    max_history: int = 500
 
 
 @dataclass
 class CacheConfig:
-    """Configuration cache."""
     enabled: bool = True
-    ttl: int = 3600  # secondes
-    max_size: int = 1000
+    ttl_seconds: int = 300
+    max_size: int = 1024
 
 
 @dataclass
-class AppConfig:
-    """Configuration globale application."""
-    app_name: str = "Editorial Agent IA"
-    version: str = "1.0.0"
-    debug: bool = False
-    log_level: str = "INFO"
-    
-    llm: LLMConfig = field(default_factory=LLMConfig)
+class GenerationConfig:
+    default_theme: str = "IA"
+    default_language: str = "fr"
+    supported_languages: list[str] = field(default_factory=lambda: ["en", "fr", "es", "de"])
+    candidates_per_request: int = 9
+    max_parallel_generations: int = 4
+
+
+@dataclass
+class Settings:
+    app: AppMetaConfig = field(default_factory=AppMetaConfig)
+    api: APIConfig = field(default_factory=APIConfig)
+    llm: LLMRuntimeConfig = field(default_factory=LLMRuntimeConfig)
     ollama: OllamaConfig = field(default_factory=OllamaConfig)
     openai: OpenAIConfig = field(default_factory=OpenAIConfig)
     groq: GroqConfig = field(default_factory=GroqConfig)
     sources: SourcesConfig = field(default_factory=SourcesConfig)
     memory: MemoryConfig = field(default_factory=MemoryConfig)
     cache: CacheConfig = field(default_factory=CacheConfig)
-    
-    # API
-    api_host: str = "0.0.0.0"
-    api_port: int = 8000
-    api_prefix: str = "/api/v1"
+    generation: GenerationConfig = field(default_factory=GenerationConfig)
 
 
-def load_config() -> AppConfig:
-    """Charge la configuration depuis settings.yaml et env vars."""
-    config_path = Path(__file__).parent.parent.parent / "settings.yaml"
-    
-    if config_path.exists():
-        with open(config_path, 'r', encoding='utf-8') as f:
-            data = yaml.safe_load(f) or {}
-    else:
-        data = {}
-    
-    # Override avec env vars
-    if os.getenv("OLLAMA_BASE_URL"):
-        data.setdefault("ollama", {})["base_url"] = os.getenv("OLLAMA_BASE_URL")
-    
-    if os.getenv("OPENAI_API_KEY"):
-        data.setdefault("openai", {})["api_key"] = os.getenv("OPENAI_API_KEY")
-    
-    if os.getenv("GROQ_API_KEY"):
-        data.setdefault("groq", {})["api_key"] = os.getenv("GROQ_API_KEY")
-    
-    if os.getenv("LLM_PROVIDER"):
-        data.setdefault("llm", {})["provider"] = os.getenv("LLM_PROVIDER")
-    
-    # Merge avec config defaults
-    config = AppConfig()
-    
-    # Update LLM config
-    if "llm" in data:
-        for key, val in data["llm"].items():
-            if hasattr(config.llm, key):
-                setattr(config.llm, key, val)
-    
-    # Update Ollama config
-    if "ollama" in data:
-        for key, val in data["ollama"].items():
-            if hasattr(config.ollama, key):
-                setattr(config.ollama, key, val)
-    
-    # Update OpenAI config
-    if "openai" in data:
-        for key, val in data["openai"].items():
-            if hasattr(config.openai, key):
-                setattr(config.openai, key, val)
-    
-    # Update Groq config
-    if "groq" in data:
-        for key, val in data["groq"].items():
-            if hasattr(config.groq, key):
-                setattr(config.groq, key, val)
-    
-    # Update Sources config
-    if "sources" in data:
-        for key, val in data["sources"].items():
-            if hasattr(config.sources, key):
-                setattr(config.sources, key, val)
-    
-    # Update Memory config
-    if "memory" in data:
-        for key, val in data["memory"].items():
-            if hasattr(config.memory, key):
-                setattr(config.memory, key, val)
-    
-    # Update Cache config
-    if "cache" in data:
-        for key, val in data["cache"].items():
-            if hasattr(config.cache, key):
-                setattr(config.cache, key, val)
-    
-    # Update App config
-    if "app" in data:
-        for key, val in data["app"].items():
-            if hasattr(config, key):
-                setattr(config, key, val)
-    
-    return config
+
+def _merge_dataclass(instance: Any, data: dict[str, Any]) -> None:
+    for key, value in data.items():
+        if hasattr(instance, key):
+            setattr(instance, key, value)
 
 
-# Instance globale
-CONFIG = load_config()
+
+def _apply_env_overrides(settings: Settings) -> None:
+    settings.openai.api_key = os.getenv("OPENAI_API_KEY", settings.openai.api_key)
+    settings.groq.api_key = os.getenv("GROQ_API_KEY", settings.groq.api_key)
+    settings.sources.newsapi_key = os.getenv("NEWSAPI_KEY", settings.sources.newsapi_key)
+    settings.ollama.base_url = os.getenv("OLLAMA_BASE_URL", settings.ollama.base_url)
+    settings.llm.primary_provider = os.getenv("LLM_PROVIDER", settings.llm.primary_provider)
+
+
+
+def load_settings() -> Settings:
+    root = Path(__file__).resolve().parents[2]
+    config_file = root / "settings.yaml"
+    settings = Settings()
+
+    if config_file.exists():
+        raw = yaml.safe_load(config_file.read_text(encoding="utf-8")) or {}
+        _merge_dataclass(settings.app, raw.get("app", {}))
+        _merge_dataclass(settings.api, raw.get("api", {}))
+        _merge_dataclass(settings.llm, raw.get("llm", {}))
+        _merge_dataclass(settings.ollama, raw.get("ollama", {}))
+        _merge_dataclass(settings.openai, raw.get("openai", {}))
+        _merge_dataclass(settings.groq, raw.get("groq", {}))
+        _merge_dataclass(settings.sources, raw.get("sources", {}))
+        _merge_dataclass(settings.memory, raw.get("memory", {}))
+        _merge_dataclass(settings.cache, raw.get("cache", {}))
+        _merge_dataclass(settings.generation, raw.get("generation", {}))
+
+    _apply_env_overrides(settings)
+    return settings
+
+
+SETTINGS = load_settings()

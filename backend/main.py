@@ -1,92 +1,61 @@
-"""
-API FastAPI pour l'Editorial Agent.
-Routes : generation, trends, memory, admin.
-"""
+﻿from __future__ import annotations
 
-from fastapi import FastAPI, HTTPException, BackgroundTasks
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
-import logging
 
-from .core.config import CONFIG
-from .core.logger import get_logger
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from .agent.orchestrator import orchestrator
+from .api.routes_admin import router as admin_router
+from .api.routes_generate import router as generate_router
+from .api.routes_memory import router as memory_router
+from .api.routes_trends import router as trends_router
+from .core.config import SETTINGS
+from .core.logger import get_logger
 
-# Logging
 logger = get_logger(__name__)
 
-# Lifespan
+
 @asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup
-    logger.info("Initializing Editorial Agent...")
-    await orchestrator.initialize()
-    logger.info("Editorial Agent ready!")
-    
+async def lifespan(_: FastAPI):
+    logger.info("Starting Editorial Agent v%s", SETTINGS.app.version)
+    await orchestrator.fetch_trends(limit=20, force_refresh=True)
     yield
-    
-    # Shutdown
-    logger.info("Shutting down Editorial Agent...")
+    logger.info("Stopping Editorial Agent")
 
 
-# FastAPI app
 app = FastAPI(
-    title="Editorial Agent IA",
-    description="Agent IA pour générer des tweets viraux",
-    version=CONFIG.version,
+    title=SETTINGS.app.app_name,
+    version=SETTINGS.app.version,
     lifespan=lifespan,
+    docs_url="/docs",
 )
 
-# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=SETTINGS.api.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Routes
-from .api.routes_generate import router as generate_router
-from .api.routes_trends import router as trends_router
-from .api.routes_memory import router as memory_router
-from .api.routes_admin import router as admin_router
-
-app.include_router(generate_router, prefix=f"{CONFIG.api_prefix}/generate", tags=["generate"])
-app.include_router(trends_router, prefix=f"{CONFIG.api_prefix}/trends", tags=["trends"])
-app.include_router(memory_router, prefix=f"{CONFIG.api_prefix}/memory", tags=["memory"])
-app.include_router(admin_router, prefix=f"{CONFIG.api_prefix}/admin", tags=["admin"])
-
-
-# Health check
-@app.get("/health")
-async def health():
-    """Health check endpoint."""
-    return {
-        "status": "ok",
-        "app": CONFIG.app_name,
-        "version": CONFIG.version,
-    }
+base = SETTINGS.api.prefix
+app.include_router(generate_router, prefix=f"{base}/generate", tags=["generate"])
+app.include_router(trends_router, prefix=f"{base}/trends", tags=["trends"])
+app.include_router(memory_router, prefix=f"{base}/memory", tags=["memory"])
+app.include_router(admin_router, prefix=f"{base}/admin", tags=["admin"])
 
 
 @app.get("/")
 async def root():
-    """API root."""
     return {
-        "app": CONFIG.app_name,
-        "version": CONFIG.version,
+        "name": SETTINGS.app.app_name,
+        "version": SETTINGS.app.version,
         "docs": "/docs",
-        "api": f"{CONFIG.api_prefix}",
+        "api_prefix": SETTINGS.api.prefix,
     }
 
 
-if __name__ == "__main__":
-    import uvicorn
-    
-    uvicorn.run(
-        app,
-        host=CONFIG.api_host,
-        port=CONFIG.api_port,
-        log_level=CONFIG.log_level.lower(),
-    )
+@app.get("/health")
+async def health():
+    return {"status": "ok", "service": SETTINGS.app.app_name}

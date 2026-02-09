@@ -6,23 +6,23 @@ from ..core.config import SETTINGS
 
 
 @dataclass
-class OpenAIClient:
-    api_key: str = SETTINGS.openai.api_key
-    model: str = SETTINGS.openai.model
-    temperature: float = SETTINGS.openai.temperature
+class GroqClient:
+    api_key: str = SETTINGS.groq.api_key
+    model: str = SETTINGS.groq.model
+    temperature: float = SETTINGS.groq.temperature
 
     async def healthcheck(self, timeout: float = 3.0) -> bool:
         return bool(self.api_key)
 
     async def generate(self, prompt: str, timeout: float) -> str:
         if not self.api_key:
-            raise RuntimeError("OPENAI_API_KEY missing")
+            raise RuntimeError("GROQ_API_KEY missing")
         try:
-            from openai import AsyncOpenAI
+            from groq import AsyncGroq
         except Exception as exc:  # noqa: BLE001
-            raise RuntimeError("openai package missing") from exc
+            raise RuntimeError("groq package missing") from exc
 
-        client = AsyncOpenAI(api_key=self.api_key, timeout=timeout)
+        client = AsyncGroq(api_key=self.api_key, timeout=timeout)
         completion = await client.chat.completions.create(
             model=self.model,
             messages=[

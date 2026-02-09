@@ -1,122 +1,101 @@
-"""
-Modèles de données pour tweets et tendances.
-Utilisés dans l'API et l'agent.
-"""
+﻿from __future__ import annotations
 
-from dataclasses import dataclass, field, asdict
-from typing import Optional, List, Dict, Any
-from datetime import datetime
-import json
+from typing import Literal
+
+from pydantic import BaseModel, Field, field_validator
+
+from ..core.utils import normalize_text
+
+THEMES = [
+    "IA",
+    "Tech",
+    "Science",
+    "Sport",
+    "Politique",
+    "Business",
+    "Crypto",
+    "Univers",
+    "Culture",
+    "Humour",
+    "Faits surprenants",
+    "Philosophie",
+    "Futur",
+]
+
+STYLES = ["insight", "agressive", "ironique", "minimal", "story", "data"]
 
 
-@dataclass
-class Tweet:
-    """Modèle de tweet avec metadata."""
-    content: str
+class ScoreBreakdown(BaseModel):
+    length: float = 0.0
+    clarity: float = 0.0
+    emotion: float = 0.0
+    mirror: float = 0.0
+    punchline: float = 0.0
+    contradiction: float = 0.0
+    viral: float = 0.0
+    total: float = 0.0
+
+
+class TweetCandidate(BaseModel):
+    id: str
+    text: str = Field(min_length=8, max_length=280)
+    theme: str
+    style: str
+    language: str = "fr"
+    angle: str = "standard"
+    source_trend_id: str | None = None
+    provider_used: str = "fallback"
     score: float = 0.0
-    theme: str = "general"
-    source: str = "generated"
-    created_at: float = field(default_factory=lambda: datetime.now().timestamp())
-    id: Optional[str] = None
-    
-    # Scores détaillés
-    length_score: float = 0.0
-    clarity_score: float = 0.0
-    emotion_score: float = 0.0
-    mirror_score: float = 0.0
-    punchline_score: float = 0.0
-    contradiction_score: float = 0.0
-    viral_score: float = 0.0
-    
-    # Metadata
-    language: str = "fr"
-    tags: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    
-    def to_dict(self) -> dict:
-        """Convertit en dictionnaire."""
-        return asdict(self)
-    
-    def to_json(self) -> str:
-        """Convertit en JSON."""
-        return json.dumps(self.to_dict(), ensure_ascii=False, default=str)
-    
-    @staticmethod
-    def from_dict(data: dict) -> "Tweet":
-        """Crée depuis un dictionnaire."""
-        return Tweet(**{k: v for k, v in data.items() if k in Tweet.__dataclass_fields__})
-    
-    def __str__(self) -> str:
-        return f"[{self.theme}] ({self.score:.2f}) {self.content[:80]}"
+    breakdown: ScoreBreakdown = Field(default_factory=ScoreBreakdown)
+
+    @field_validator("text")
+    @classmethod
+    def _normalize(cls, value: str) -> str:
+        return normalize_text(value)
 
 
-@dataclass
-class Trend:
-    """Modèle de tendance avec détails."""
-    title: str
-    description: str = ""
-    category: str = "general"
-    source: str = "unknown"
-    trending_score: float = 0.0
-    url: str = ""
-    language: str = "en"
-    created_at: float = field(default_factory=lambda: datetime.now().timestamp())
-    id: Optional[str] = None
-    
-    # Metadata
-    tags: List[str] = field(default_factory=list)
-    related_keywords: List[str] = field(default_factory=list)
-    engagement: int = 0
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    
-    # Génération associée
-    generated_tweets: List[str] = field(default_factory=list)
-    
-    def to_dict(self) -> dict:
-        """Convertit en dictionnaire."""
-        return asdict(self)
-    
-    def to_json(self) -> str:
-        """Convertit en JSON."""
-        return json.dumps(self.to_dict(), ensure_ascii=False, default=str)
-    
-    @staticmethod
-    def from_dict(data: dict) -> "Trend":
-        """Crée depuis un dictionnaire."""
-        return Trend(**{k: v for k, v in data.items() if k in Trend.__dataclass_fields__})
-    
-    def __str__(self) -> str:
-        return f"[{self.source}] {self.title}"
+class TweetRemixSet(BaseModel):
+    original: TweetCandidate
+    shorter: TweetCandidate
+    aggressive: TweetCandidate
+    ironic: TweetCandidate
+    minimalist: TweetCandidate
+    punchline: TweetCandidate
 
 
-@dataclass
-class GenerationRequest:
-    """Requête de génération de tweets."""
-    trend: Optional[Trend] = None
-    theme: str = "general"
-    count: int = 3
-    style: str = "normal"  # normal, aggressive, funny, minimal
-    language: str = "fr"
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    
-    def to_dict(self) -> dict:
-        return asdict(self)
+class GenerateTweetsRequest(BaseModel):
+    trend_id: str | None = None
+    trend_text: str | None = None
+    theme: str = "IA"
+    style: str = "insight"
+    language: Literal["en", "fr", "es", "de"] = "fr"
+    count: int = Field(default=9, ge=3, le=30)
+    include_remix: bool = True
+    draft_mode: bool = False
 
 
-@dataclass
-class GenerationResponse:
-    """Réponse de génération."""
-    tweets: List[Tweet]
-    trend: Optional[Trend] = None
-    total_time: float = 0.0
-    model: str = "unknown"
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    
-    def to_dict(self) -> dict:
-        return {
-            "tweets": [t.to_dict() for t in self.tweets],
-            "trend": self.trend.to_dict() if self.trend else None,
-            "total_time": self.total_time,
-            "model": self.model,
-            "metadata": self.metadata,
-        }
+class GenerateTweetsResponse(BaseModel):
+    top3: list[TweetCandidate]
+    all_candidates: list[TweetCandidate]
+    remixes: list[TweetRemixSet] = Field(default_factory=list)
+    metadata: dict
+
+
+class ABTestRequest(BaseModel):
+    theme: str
+    trend_text: str
+    variant_a_style: str = "insight"
+    variant_b_style: str = "ironique"
+    samples: int = Field(default=6, ge=2, le=20)
+
+
+class ABTestResult(BaseModel):
+    winner: str
+    variant_a_avg_score: float
+    variant_b_avg_score: float
+    variant_a_top: list[TweetCandidate]
+    variant_b_top: list[TweetCandidate]
+
+
+class FavoriteTweetRequest(BaseModel):
+    tweet_id: str

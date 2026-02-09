@@ -1,297 +1,114 @@
-"""
-Système de scoring avancé pour les tweets.
-Score basé sur : longueur, clarté, émotion, punchline, potentiel viral, etc.
-"""
+﻿from __future__ import annotations
 
 import re
-from typing import Dict, List
-from dataclasses import dataclass
 
-from ..core.logger import get_logger
-from ..core.utils import estimate_tweet_length
-from ..models.tweet import Tweet
-
-logger = get_logger(__name__)
+from ..core.utils import clamp, estimate_tweet_length
+from ..models.tweet import ScoreBreakdown, TweetCandidate
 
 
-@dataclass
-class ScoreBreakdown:
-    """Détail du score d'un tweet."""
-    total: float
-    length: float
-    clarity: float
-    emotion: float
-    mirror: float
-    punchline: float
-    contradiction: float
-    viral: float
+class TweetScoringEngine:
+    EMOTION_WORDS = {
+        "urgent",
+        "explose",
+        "incroyable",
+        "secret",
+        "scandale",
+        "choc",
+        "jamais",
+        "révolution",
+        "alerte",
+        "bascule",
+    }
+    MIRROR_WORDS = {"tu", "vous", "ton", "votre", "on", "nous"}
 
+    def score(self, tweet: TweetCandidate) -> TweetCandidate:
+        text = tweet.text
+        length = self._score_length(text)
+        clarity = self._score_clarity(text)
+        emotion = self._score_emotion(text)
+        mirror = self._score_mirror(text)
+        punchline = self._score_punchline(text)
+        contradiction = self._score_contradiction(text)
+        viral = self._score_viral(text)
 
-class TweetScorer:
-    """Score les tweets selon plusieurs critères."""
-    
-    def __init__(self):
-        # Patterns pour détecter les éléments
-        self.question_pattern = r"\?$"
-        self.hashtag_pattern = r"#\w+"
-        self.emoji_pattern = r"[😀-🙏🌀-🗿]"
-        self.url_pattern = r"https?://\S+"
-        self.caps_pattern = r"[A-Z]{3,}"  # 3+ lettres majuscules
-        self.all_caps_pattern = r"^[A-Z\s\d\!\?]+$"  # Texte entièrement en majuscules
-        
-        # Emotional keywords
-        self.strong_emotions = ["adorable", "magnifique", "horrible", "inacceptable", "dégoutant",
-                               "excellent", "catastrophe", "crise", "révolution", "scandale"]
-        self.weak_emotions = ["bien", "assez", "plutôt", "un peu", "à peine"]
-    
-    def score(self, tweet: Tweet) -> ScoreBreakdown:
-        """
-        Score un tweet sur multiple dimensions.
-        
-        Args:
-            tweet: Tweet à scorer
-        
-        Returns:
-            ScoreBreakdown avec tous les scores
-        """
-        text = tweet.content
-        
-        # Scores individuels (0-1)
-        length_score = self._score_length(text)
-        clarity_score = self._score_clarity(text)
-        emotion_score = self._score_emotion(text)
-        mirror_score = self._score_mirror(text)
-        punchline_score = self._score_punchline(text)
-        contradiction_score = self._score_contradiction(text)
-        viral_score = self._score_viral(text)
-        
-        # Score total (moyenne pondérée)
-        weights = {
-            "length": 0.15,
-            "clarity": 0.15,
-            "emotion": 0.15,
-            "mirror": 0.10,
-            "punchline": 0.15,
-            "contradiction": 0.15,
-            "viral": 0.15,
-        }
-        
         total = (
-            length_score * weights["length"] +
-            clarity_score * weights["clarity"] +
-            emotion_score * weights["emotion"] +
-            mirror_score * weights["mirror"] +
-            punchline_score * weights["punchline"] +
-            contradiction_score * weights["contradiction"] +
-            viral_score * weights["viral"]
+            0.14 * length
+            + 0.16 * clarity
+            + 0.15 * emotion
+            + 0.10 * mirror
+            + 0.15 * punchline
+            + 0.15 * contradiction
+            + 0.15 * viral
         )
-        
-        breakdown = ScoreBreakdown(
-            total=total,
-            length=length_score,
-            clarity=clarity_score,
-            emotion=emotion_score,
-            mirror=mirror_score,
-            punchline=punchline_score,
-            contradiction=contradiction_score,
-            viral=viral_score,
+
+        tweet.breakdown = ScoreBreakdown(
+            length=length,
+            clarity=clarity,
+            emotion=emotion,
+            mirror=mirror,
+            punchline=punchline,
+            contradiction=contradiction,
+            viral=viral,
+            total=round(total, 4),
         )
-        
-        # Update tweet
-        tweet.score = total
-        tweet.length_score = length_score
-        tweet.clarity_score = clarity_score
-        tweet.emotion_score = emotion_score
-        tweet.mirror_score = mirror_score
-        tweet.punchline_score = punchline_score
-        tweet.contradiction_score = contradiction_score
-        tweet.viral_score = viral_score
-        
-        return breakdown
-    
+        tweet.score = round(total, 4)
+        return tweet
+
+    def rank(self, tweets: list[TweetCandidate]) -> list[TweetCandidate]:
+        scored = [self.score(t) for t in tweets]
+        return sorted(scored, key=lambda t: t.score, reverse=True)
+
     def _score_length(self, text: str) -> float:
-        """Score la longueur optimale (150-260 chars)."""
-        length = estimate_tweet_length(text)
-        
-        # Optimum : 150-260 chars
-        if 150 <= length <= 260:
+        ln = estimate_tweet_length(text)
+        if 120 <= ln <= 220:
             return 1.0
-        elif 100 <= length < 150:
-            return 0.8  # Un peu court
-        elif 260 < length <= 280:
-            return 0.9  # Un peu long mais acceptable
-        elif 50 <= length < 100:
-            return 0.5  # Très court
-        else:
-            return 0.3  # Trop court ou trop long
-    
-    def _score_clarity(self, text: str) -> float:
-        """Score la clarté du message."""
-        score = 1.0
-        
-        # Penalize abbreviations excessives
-        abbrev_count = len(re.findall(r"\b[a-z]{1,2}\b", text))
-        if abbrev_count > 5:
-            score -= 0.2
-        
-        # Penalize excessive punctuation
-        punct_ratio = len(re.findall(r"[!?\.]{2,}", text)) / (len(text) / 100 + 1)
-        if punct_ratio > 0.1:
-            score -= 0.1
-        
-        # Bonus pour structure claire
-        sentences = len(re.split(r"[.!?;]", text.strip()))
-        if sentences <= 3:
-            score += 0.1
-        
-        # Bonus pour mots clés
-        keywords = ["important", "évidement", "précis", "clair", "vrai"]
-        if any(kw in text.lower() for kw in keywords):
-            score += 0.05
-        
-        return max(0, min(score, 1.0))
-    
-    def _score_emotion(self, text: str) -> float:
-        """Score la charge émotionnelle."""
-        text_lower = text.lower()
-        score = 0.5  # Neutre par défaut
-        
-        # Compte les émotions fortes
-        strong_count = sum(1 for e in self.strong_emotions if e in text_lower)
-        score += strong_count * 0.15
-        
-        # Compte les émotions faibles
-        weak_count = sum(1 for e in self.weak_emotions if e in text_lower)
-        score -= weak_count * 0.05
-        
-        # Bonus pour emojis
-        if re.search(self.emoji_pattern, text):
-            score += 0.1
-        
-        # Bonus pour majuscules (emphase)
-        caps_words = len(re.findall(self.caps_pattern, text))
-        if caps_words > 0:
-            score += min(caps_words * 0.05, 0.15)
-        
-        # Penalize tout majuscules (sauf short)
-        if len(text) > 20 and re.match(self.all_caps_pattern, text):
-            score -= 0.3
-        
-        return max(0, min(score, 1.0))
-    
-    def _score_mirror(self, text: str) -> float:
-        """Score l'effet miroir (parler du lecteur)."""
-        text_lower = text.lower()
-        mirror_words = ["vous", "tu", "votre", "ton", "toi", "nous", "on", "ta", "tes", "vos"]
-        
-        count = sum(text_lower.count(w) for w in mirror_words)
-        
-        # 1-2 occurrences = bon
-        if count == 0:
-            return 0.3
-        elif 1 <= count <= 2:
+        if 80 <= ln < 120 or 220 < ln <= 260:
             return 0.8
-        elif count <= 4:
+        if 40 <= ln < 80 or 260 < ln <= 280:
+            return 0.55
+        return 0.25
+
+    def _score_clarity(self, text: str) -> float:
+        sentence_count = max(1, len([s for s in re.split(r"[.!?]", text) if s.strip()]))
+        punctuation_noise = len(re.findall(r"[!?]{2,}|\.{3,}", text))
+        base = 1.0 - (0.12 * max(0, sentence_count - 2)) - (0.08 * punctuation_noise)
+        return clamp(base)
+
+    def _score_emotion(self, text: str) -> float:
+        tokens = re.findall(r"\w+", text.lower())
+        hits = sum(1 for token in tokens if token in self.EMOTION_WORDS)
+        has_exclaim = "!" in text
+        base = 0.42 + (hits * 0.13) + (0.08 if has_exclaim else 0.0)
+        return clamp(base)
+
+    def _score_mirror(self, text: str) -> float:
+        tokens = set(re.findall(r"\w+", text.lower()))
+        hits = len(tokens & self.MIRROR_WORDS)
+        if hits == 0:
+            return 0.35
+        if hits == 1:
+            return 0.75
+        if hits <= 3:
             return 0.9
-        else:
-            return 0.6  # Trop d'occurrences = pas naturel
-    
+        return 0.65
+
     def _score_punchline(self, text: str) -> float:
-        """Score la présence d'une punchline (humor, twist, conclusion)."""
-        score = 0.3
-        
-        # Patterns de punchline
-        patterns = [
-            r"\.?\?[^.]*$",  # Fin avec question
-            r"mais\s+[^.]+\.$",  # "mais" suivi de conclusion
-            r"d'ailleurs",  # Transition vers detail
-            r"au fait",  # Revelation
-            r"spoiler",  # Avant une révélation
-            r"attends",  # Invitation à attendre la suite
-        ]
-        
-        for pattern in patterns:
-            if re.search(pattern, text.lower()):
-                score += 0.15
-        
-        # Bonus pour ironie détectée
-        if "soit-disant" in text.lower() or "prétendument" in text.lower():
-            score += 0.15
-        
-        # Bonus pour contraste
-        if " mais " in text.lower() or " au contraire" in text.lower():
-            score += 0.1
-        
-        return min(score, 1.0)
-    
+        end_bonus = 0.2 if re.search(r"[!?]$", text.strip()) else 0.0
+        has_colon = 0.15 if ":" in text else 0.0
+        short_end = 0.2 if len(text.split()) <= 24 else 0.0
+        return clamp(0.35 + end_bonus + has_colon + short_end)
+
     def _score_contradiction(self, text: str) -> float:
-        """Score la présence de contradictions intéressantes."""
-        score = 0.2
-        
-        patterns = [
-            r"mais|cependant|pourtant|alors que|au contraire|sauf que|ne pas",
-        ]
-        
-        for pattern in patterns:
-            if re.search(pattern, text.lower()):
-                score += 0.2
-        
-        return min(score, 1.0)
-    
+        markers = ["mais", "pourtant", "alors que", "sauf que", "paradoxalement", "contre-intuitif"]
+        hits = sum(1 for marker in markers if marker in text.lower())
+        return clamp(0.25 + hits * 0.22)
+
     def _score_viral(self, text: str) -> float:
-        """Score le potentiel viral global."""
-        score = 0.4
-        
-        # Viral keywords
-        viral_keywords = [
-            "trending", "buzz", "breaking", "alert", "importante",
-            "révèle", "changemment", "nouveau", "choquant",
-            "record", "jamais", "première", "découverte",
-        ]
-        
-        text_lower = text.lower()
-        for kw in viral_keywords:
-            if kw in text_lower:
-                score += 0.1
-        
-        # Hashtags (bon pour viral)
-        hashtags = len(re.findall(self.hashtag_pattern, text))
-        score += min(hashtags * 0.1, 0.2)
-        
-        # URLs (bon pour viral)
-        urls = len(re.findall(self.url_pattern, text))
-        score += min(urls * 0.1, 0.15)
-        
-        # Emojis (bon pour engagement)
-        emojis = len(re.findall(self.emoji_pattern, text))
-        score += min(emojis * 0.05, 0.1)
-        
-        # Mention d'une tendance (trend connection)
-        if any(trend_word in text.lower() for trend_word in ["IA", "tech", "crypto", "startup"]):
-            score += 0.1
-        
-        return min(score, 1.0)
-    
-    def sort_tweets(self, tweets: List[Tweet], reverse: bool = True) -> List[Tweet]:
-        """
-        Score et trie les tweets.
-        
-        Args:
-            tweets: Liste de tweets
-            reverse: Si True, meilleurs d'abord
-        
-        Returns:
-            Tweets triés par score
-        """
-        for tweet in tweets:
-            self.score(tweet)
-        
-        return sorted(tweets, key=lambda t: t.score, reverse=reverse)
-    
-    def get_top(self, tweets: List[Tweet], n: int = 3) -> List[Tweet]:
-        """Retourne les N meilleurs tweets."""
-        return self.sort_tweets(tweets)[:n]
+        hashtags = len(re.findall(r"#\w+", text))
+        numbers = len(re.findall(r"\d+", text))
+        question = 1 if "?" in text else 0
+        base = 0.4 + min(hashtags * 0.08, 0.2) + min(numbers * 0.08, 0.16) + question * 0.12
+        return clamp(base)
 
 
-# Instance globale
-scorer = TweetScorer()
+scoring_engine = TweetScoringEngine()

@@ -1,107 +1,28 @@
-"""
-Traducteur multilingue.
-Support : EN, FR, ES, DE avec traduction naturelle.
-"""
-
-from typing import Optional
+﻿from __future__ import annotations
 
 from ..core.logger import get_logger
-from ..providers.router import router
+from ..providers import router
 
 logger = get_logger(__name__)
 
 
 class Translator:
-    """Traduit des textes entre langues."""
-    
-    SUPPORTED_LANGS = {
-        "fr": "French",
-        "en": "English",
-        "es": "Spanish",
-        "de": "German",
-        "it": "Italian",
-        "pt": "Portuguese",
-    }
-    
-    def __init__(self):
-        self.router = router
-    
-    async def translate(
-        self,
-        text: str,
-        source_lang: str = "en",
-        target_lang: str = "fr",
-        keep_tone: bool = True,
-    ) -> Optional[str]:
-        """Traduit un texte."""
-        if source_lang == target_lang:
+    async def to_french(self, text: str, source_language: str) -> str:
+        if source_language == "fr":
             return text
-        
-        if source_lang not in self.SUPPORTED_LANGS:
-            logger.warning(f"Unsupported source language: {source_lang}")
-            return None
-        
-        if target_lang not in self.SUPPORTED_LANGS:
-            logger.warning(f"Unsupported target language: {target_lang}")
-            return None
-        
-        source_name = self.SUPPORTED_LANGS[source_lang]
-        target_name = self.SUPPORTED_LANGS[target_lang]
-        
-        tone_instruction = "Keep the exact tone, style, and any humor or irony. Don't change the meaning." if keep_tone else ""
-        
-        prompt = f"""Translate this text from {source_name} to {target_name}.
-        
-Text to translate:
-"{text}"
 
-{tone_instruction}
-
-Provide ONLY the translation, no explanation."""
-        
+        prompt = (
+            "Translate this text into natural French for social media. "
+            "Keep meaning, keep impact, no markdown.\n\n"
+            f"Source language: {source_language}\n"
+            f"Text: {text}"
+        )
         try:
-            translated = await self.router.generate(prompt, temperature=0.3, max_tokens=300)
-            return translated.strip()
-        except Exception as e:
-            logger.error(f"Translation failed: {e}")
-            return None
-    
-    async def translate_batch(
-        self,
-        texts: list[str],
-        source_lang: str = "en",
-        target_lang: str = "fr",
-    ) -> list[Optional[str]]:
-        """Traduit plusieurs textes."""
-        import asyncio
-        
-        tasks = [
-            self.translate(text, source_lang, target_lang)
-            for text in texts
-        ]
-        
-        return await asyncio.gather(*tasks)
-    
-    async def detect_language(self, text: str) -> str:
-        """Détecte la langue d'un texte."""
-        try:
-            # Utilise une libraire légère pour la détection
-            from langdetect import detect
-            lang_code = detect(text)
-            
-            # Normalise
-            for code, name in self.SUPPORTED_LANGS.items():
-                if lang_code.startswith(code):
-                    return code
-            
-            return "en"  # Default
-        except Exception:
-            # Fallback simple : count French words
-            fr_words = ["le", "la", "les", "de", "un", "une", "est", "et", "que", "pour"]
-            fr_count = sum(1 for word in text.lower().split() if word in fr_words)
-            
-            return "fr" if fr_count > len(text.split()) * 0.1 else "en"
+            result = await router.generate(prompt)
+            return result.text.strip() or text
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("Translation fallback used: %s", exc)
+            return text
 
 
-# Instance globale
 translator = Translator()

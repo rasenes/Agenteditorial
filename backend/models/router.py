@@ -1,14 +1,8 @@
-import yaml
-from providers.ollama import Ollama
+﻿"""Legacy compatibility module.
 
-with open("settings.yaml", "r", encoding="utf-8") as f:
-    SETTINGS = yaml.safe_load(f)
+Prefer using `backend.providers.router.router` directly.
+"""
 
-def get_generator():
-    provider = SETTINGS["generation"]["provider"]
-    model = SETTINGS["generation"]["model"]
+from ..providers.router import router
 
-    if provider == "ollama":
-        return Ollama(model)
-
-    raise ValueError(f"Provider inconnu : {provider}")
+__all__ = ["router"]

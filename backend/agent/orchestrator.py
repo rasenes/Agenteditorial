@@ -1,216 +1,149 @@
-"""
-Orchestrateur principal du pipeline IA editorial.
-Coordonne : sources → analyse → génération → scoring → mémoire.
-"""
+﻿from __future__ import annotations
 
-import asyncio
-import time
-from typing import List, Optional
+from pathlib import Path
 
+from ..core.cache import cache
 from ..core.logger import get_logger
-from ..core.config import CONFIG
-from ..models.tweet import Trend, Tweet, GenerationRequest, GenerationResponse
-
+from ..core.utils import now_ts
+from ..models.trend import Trend
+from ..models.tweet import ABTestRequest, ABTestResult, GenerateTweetsRequest, GenerateTweetsResponse
 from .generator import generator
-from .scoring import scorer
-from .remix_engine import remix_engine
 from .memory_engine import memory_engine
-from .trend_analyzer import analyzer
-from .sources import create_trend_fetcher
+from .remix_engine import remix_engine
+from .scoring import scoring_engine
+from .trend_analyzer import trend_analyzer
 
 logger = get_logger(__name__)
 
 
 class EditorialOrchestrator:
-    """Orchestre le pipeline complet de génération de tweets."""
-    
-    def __init__(self):
-        self.generator = generator
-        self.scorer = scorer
-        self.remix_engine = remix_engine
-        self.memory = memory_engine
-        self.analyzer = analyzer
-        self.trend_fetcher: Optional[object] = None
-    
-    async def initialize(self) -> None:
-        """Initialise l'orchestrateur (charge les sources, etc.)."""
-        try:
-            self.trend_fetcher = await create_trend_fetcher(CONFIG)
-            logger.info("Editorial Orchestrator initialized")
-        except Exception as e:
-            logger.error(f"Failed to initialize orchestrator: {e}")
-    
-    async def fetch_trends(self) -> List[Trend]:
-        """Récupère les tendances actuelles."""
-        if not self.trend_fetcher:
-            logger.warning("Trend fetcher not initialized")
-            return []
-        
-        try:
-            trends = await self.trend_fetcher.fetch_all_trends()
-            logger.info(f"Fetched {len(trends)} trends")
-            
-            # Score et analyse
-            trends = self.analyzer.score_trends(trends)
-            
-            return trends
-        except Exception as e:
-            logger.error(f"Failed to fetch trends: {e}")
-            return []
-    
-    async def generate_for_trend(
-        self,
-        trend: Trend,
-        count: int = 3,
-        style: str = "normal",
-        create_remixes: bool = False,
-    ) -> List[Tweet]:
-        """Génère des tweets pour une tendance spécifique."""
-        try:
-            # Génere
-            request = GenerationRequest(
-                trend=trend,
-                theme=trend.category,
-                count=count,
-                style=style,
-            )
-            
-            response = await self.generator.generate(request)
-            tweets = response.tweets
-            
-            logger.info(f"Generated {len(tweets)} tweets for {trend.title}")
-            
-            # Score
-            tweets = self.scorer.sort_tweets(tweets)
-            
-            # Remixes optionnels
-            if create_remixes and tweets:
-                best_tweet = tweets[0]
-                remixes = await self.remix_engine.remix_parallel(best_tweet)
-                tweets.extend(remixes)
-                logger.info(f"Created {len(remixes)} remixes")
-            
-            # Stocke en mémoire
-            for tweet in tweets[:count]:  # Stocke top K
-                self.memory.add_tweet(tweet, tweet.score)
-                self.memory.record_style_performance(trend.category, style, tweet.score)
-            
-            return tweets[:count]
-        
-        except Exception as e:
-            logger.error(f"Generation for trend failed: {e}")
-            return []
-    
-    async def generate_for_trends(
-        self,
-        trends: List[Trend],
-        count_per_trend: int = 2,
-        style: str = "normal",
-        max_concurrent: int = 3,
-    ) -> List[List[Tweet]]:
-        """Génère des tweets pour plusieurs tendances."""
-        semaphore = asyncio.Semaphore(max_concurrent)
-        
-        async def _generate_with_limit(trend):
-            async with semaphore:
-                return await self.generate_for_trend(
-                    trend,
-                    count=count_per_trend,
-                    style=style,
+    async def fetch_trends(self, limit: int = 40, force_refresh: bool = False) -> list[Trend]:
+        if not force_refresh:
+            cached = cache.get("trends")
+            if cached:
+                return cached[:limit]
+
+        trends = await trend_analyzer.fetch_trends(limit=limit)
+        cache.set("trends", trends)
+        return trends
+
+    async def analyze_trend(self, trend_id: str) -> tuple[Trend | None, list[str], str]:
+        trends = await self.fetch_trends(limit=80)
+        trend = next((item for item in trends if item.id == trend_id), None)
+        if not trend:
+            return None, [], "Trend introuvable"
+        angles, reason = trend_analyzer.analyze_angles(trend)
+        return trend, angles, reason
+
+    async def generate(self, request: GenerateTweetsRequest) -> GenerateTweetsResponse:
+        trend = await self._resolve_trend(request)
+        candidates = await generator.generate_candidates(request=request, trend=trend)
+        ranked = scoring_engine.rank(candidates)
+
+        remixes = []
+        if request.include_remix and ranked:
+            remixes = [remix_engine.remix(tweet) for tweet in ranked[:2]]
+            remix_candidates = []
+            for remix in remixes:
+                remix_candidates.extend(
+                    [
+                        remix.shorter,
+                        remix.aggressive,
+                        remix.ironic,
+                        remix.minimalist,
+                        remix.punchline,
+                    ]
                 )
-        
-        tasks = [_generate_with_limit(trend) for trend in trends]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-        
-        # Flatten results
-        all_tweets = []
-        for result in results:
-            if isinstance(result, list):
-                all_tweets.extend(result)
-        
-        logger.info(f"Total generated: {len(all_tweets)} tweets")
-        return [results[i] for i in range(len(trends))]
-    
-    async def full_pipeline(
-        self,
-        num_trends: int = 5,
-        tweets_per_trend: int = 3,
-        create_remixes: bool = False,
-        remix_styles: Optional[List[str]] = None,
-    ) -> dict:
-        """Exécute le pipeline complet."""
-        start_time = time.time()
-        
-        try:
-            # 1. Fetch trends
-            logger.info("=== STEP 1: Fetching trends ===")
-            trends = await self.fetch_trends()
-            trends = trends[:num_trends]
-            
-            if not trends:
-                logger.warning("No trends found")
-                return {
-                    "status": "error",
-                    "message": "No trends found",
-                    "execution_time": time.time() - start_time,
-                }
-            
-            # 2. Generate for all trends
-            logger.info("=== STEP 2: Generation ===")
-            all_results = await self.generate_for_trends(
-                trends,
-                count_per_trend=tweets_per_trend,
-                max_concurrent=3,
-            )
-            
-            # 3. Process remixes if requested
-            if create_remixes:
-                logger.info("=== STEP 3: Remixing ===")
-                all_tweets = []
-                for result in all_results:
-                    all_tweets.extend(result)
-                
-                remixed = await self.remix_engine.remix_batch(all_tweets[:5], remix_styles)
-                for tweet in remixed[:5]:
-                    self.memory.add_tweet(tweet, tweet.score)
-            
-            # 4. Memory stats
-            logger.info("=== STEP 4: Memory ===")
-            mem_stats = self.memory.get_memory_stats()
-            
-            execution_time = time.time() - start_time
-            logger.info(f"Pipeline completed in {execution_time:.2f}s")
-            
-            return {
-                "status": "success",
-                "trends_analyzed": len(trends),
-                "total_tweets_generated": len([t for r in all_results for t in r]),
-                "memory_stats": mem_stats,
-                "execution_time": execution_time,
-            }
-        
-        except Exception as e:
-            logger.error(f"Pipeline failed: {e}")
-            return {
-                "status": "error",
-                "message": str(e),
-                "execution_time": time.time() - start_time,
-            }
-    
-    async def analyze_trend(self, text: str) -> dict:
-        """Analyse un texte pour extraire angles viraux."""
-        try:
-            trend = Trend(title=text, description="")
-            angles = self.analyzer.extract_angles(trend)
-            
-            return {
-                "status": "success",
-                "angles": angles,
-            }
-        except Exception as e:
-            logger.error(f"Analysis failed: {e}")
-            return {"status": "error", "message": str(e)}
+            ranked = scoring_engine.rank(ranked + remix_candidates)
+
+        top3 = ranked[:3]
+        memory_engine.register_generation(
+            theme=request.theme,
+            trend_text=trend.title,
+            tweets=top3,
+            draft_mode=request.draft_mode,
+        )
+
+        metadata = {
+            "trend": trend.model_dump(),
+            "generated_at": now_ts(),
+            "draft_mode": request.draft_mode,
+            "memory_stats": memory_engine.get_stats(),
+            "best_styles": memory_engine.best_styles(),
+        }
+        return GenerateTweetsResponse(top3=top3, all_candidates=ranked, remixes=remixes, metadata=metadata)
+
+    async def run_ab_test(self, request: ABTestRequest) -> ABTestResult:
+        req_a = GenerateTweetsRequest(
+            trend_text=request.trend_text,
+            theme=request.theme,
+            style=request.variant_a_style,
+            count=request.samples,
+            include_remix=False,
+            draft_mode=True,
+        )
+        req_b = GenerateTweetsRequest(
+            trend_text=request.trend_text,
+            theme=request.theme,
+            style=request.variant_b_style,
+            count=request.samples,
+            include_remix=False,
+            draft_mode=True,
+        )
+
+        result_a = await self.generate(req_a)
+        result_b = await self.generate(req_b)
+
+        avg_a = sum(tweet.score for tweet in result_a.top3) / len(result_a.top3)
+        avg_b = sum(tweet.score for tweet in result_b.top3) / len(result_b.top3)
+        winner = "A" if avg_a >= avg_b else "B"
+
+        payload = {
+            "id": f"ab-{int(now_ts() * 1000)}",
+            "winner": winner,
+            "theme": request.theme,
+            "trend_text": request.trend_text,
+            "variant_a_style": request.variant_a_style,
+            "variant_b_style": request.variant_b_style,
+            "variant_a_avg_score": round(avg_a, 4),
+            "variant_b_avg_score": round(avg_b, 4),
+            "created_at": now_ts(),
+        }
+        memory_engine.register_ab_test(payload)
+
+        return ABTestResult(
+            winner=winner,
+            variant_a_avg_score=round(avg_a, 4),
+            variant_b_avg_score=round(avg_b, 4),
+            variant_a_top=result_a.top3,
+            variant_b_top=result_b.top3,
+        )
+
+    async def export_csv(self) -> str:
+        output = Path("backend/data/exports/history.csv")
+        return memory_engine.export_csv(str(output))
+
+    async def _resolve_trend(self, request: GenerateTweetsRequest) -> Trend:
+        if request.trend_id:
+            trends = await self.fetch_trends(limit=80)
+            found = next((item for item in trends if item.id == request.trend_id), None)
+            if found:
+                return found
+
+        trend_text = request.trend_text or "Global trend"
+        trend = Trend(
+            id=f"manual-{abs(hash(trend_text))}",
+            title=trend_text[:220],
+            summary="Trend fournie manuellement",
+            source="manual",
+            source_url="",
+            language=request.language,
+            theme=request.theme,
+            momentum=0.5,
+            viral_angle="insight",
+            created_at=now_ts(),
+        )
+        return trend
 
 
-# Instance globale
 orchestrator = EditorialOrchestrator()
